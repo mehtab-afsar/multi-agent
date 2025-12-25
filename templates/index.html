@@ -120,75 +120,95 @@
 
             <div class="config-content">
                 <!-- Researcher Config -->
-                <div class="agent-config">
-                    <div class="config-title">
-                        <i data-lucide="search"></i>
-                        <span>Researcher Agent</span>
+                <div class="agent-config-compact">
+                    <div class="config-title-compact" onclick="toggleAgentConfig('researcher')">
+                        <div class="config-title-left">
+                            <i data-lucide="search"></i>
+                            <span>Researcher Agent</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
                     </div>
-                    <label>Output Style:</label>
-                    <select id="researcher-style" class="config-select">
-                        <option value="bullets">Bullet Points (Default)</option>
-                        <option value="detailed">Detailed Paragraphs</option>
-                        <option value="concise">Ultra Concise</option>
-                        <option value="technical">Technical Deep Dive</option>
-                    </select>
-                    <label>Focus Area:</label>
-                    <input type="text" id="researcher-focus" class="config-input" placeholder="e.g., recent product launches, partnerships">
+                    <div class="config-details" id="config-researcher" style="display: none;">
+                        <label>Output Style:</label>
+                        <select id="researcher-style" class="config-select">
+                            <option value="bullets">Bullet Points (Default)</option>
+                            <option value="detailed">Detailed Paragraphs</option>
+                            <option value="concise">Ultra Concise</option>
+                            <option value="technical">Technical Deep Dive</option>
+                        </select>
+                        <label>Focus Area:</label>
+                        <input type="text" id="researcher-focus" class="config-input" placeholder="e.g., recent product launches, partnerships">
+                    </div>
                 </div>
 
                 <!-- Financial Agent Config -->
-                <div class="agent-config">
-                    <div class="config-title">
-                        <i data-lucide="trending-up"></i>
-                        <span>Financial Analyst Agent</span>
+                <div class="agent-config-compact">
+                    <div class="config-title-compact" onclick="toggleAgentConfig('financial')">
+                        <div class="config-title-left">
+                            <i data-lucide="trending-up"></i>
+                            <span>Financial Analyst Agent</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
                     </div>
-                    <label>Analysis Depth:</label>
-                    <select id="financial-style" class="config-select">
-                        <option value="standard">Standard Metrics</option>
-                        <option value="detailed">Detailed Financial Analysis</option>
-                        <option value="ratios">Focus on Ratios & Valuation</option>
-                        <option value="growth">Growth & Revenue Focus</option>
-                    </select>
-                    <label>Additional Metrics:</label>
-                    <input type="text" id="financial-focus" class="config-input" placeholder="e.g., P/E ratio, debt levels, cash flow">
+                    <div class="config-details" id="config-financial" style="display: none;">
+                        <label>Analysis Depth:</label>
+                        <select id="financial-style" class="config-select">
+                            <option value="standard">Standard Metrics</option>
+                            <option value="detailed">Detailed Financial Analysis</option>
+                            <option value="ratios">Focus on Ratios & Valuation</option>
+                            <option value="growth">Growth & Revenue Focus</option>
+                        </select>
+                        <label>Additional Metrics:</label>
+                        <input type="text" id="financial-focus" class="config-input" placeholder="e.g., P/E ratio, debt levels, cash flow">
+                    </div>
                 </div>
 
                 <!-- Strategic Agent Config -->
-                <div class="agent-config">
-                    <div class="config-title">
-                        <i data-lucide="target"></i>
-                        <span>Strategic Analyst Agent</span>
+                <div class="agent-config-compact">
+                    <div class="config-title-compact" onclick="toggleAgentConfig('strategic')">
+                        <div class="config-title-left">
+                            <i data-lucide="target"></i>
+                            <span>Strategic Analyst Agent</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
                     </div>
-                    <label>Analysis Framework:</label>
-                    <select id="strategic-style" class="config-select">
-                        <option value="balanced">Balanced (Default)</option>
-                        <option value="swot">SWOT Analysis</option>
-                        <option value="competitive">Competitive Positioning</option>
-                        <option value="future">Future Outlook Focus</option>
-                    </select>
-                    <label>Industry Context:</label>
-                    <input type="text" id="strategic-focus" class="config-input" placeholder="e.g., compare with competitors, market trends">
+                    <div class="config-details" id="config-strategic" style="display: none;">
+                        <label>Analysis Framework:</label>
+                        <select id="strategic-style" class="config-select">
+                            <option value="balanced">Balanced (Default)</option>
+                            <option value="swot">SWOT Analysis</option>
+                            <option value="competitive">Competitive Positioning</option>
+                            <option value="future">Future Outlook Focus</option>
+                        </select>
+                        <label>Industry Context:</label>
+                        <input type="text" id="strategic-focus" class="config-input" placeholder="e.g., compare with competitors, market trends">
+                    </div>
                 </div>
 
                 <!-- Report Writer Config -->
-                <div class="agent-config">
-                    <div class="config-title">
-                        <i data-lucide="file-text"></i>
-                        <span>Report Writer Agent</span>
+                <div class="agent-config-compact">
+                    <div class="config-title-compact" onclick="toggleAgentConfig('writer')">
+                        <div class="config-title-left">
+                            <i data-lucide="file-text"></i>
+                            <span>Report Writer Agent</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron-icon"></i>
                     </div>
-                    <label>Report Tone:</label>
-                    <select id="writer-style" class="config-select">
-                        <option value="professional">Professional (Default)</option>
-                        <option value="executive">Executive Summary Style</option>
-                        <option value="detailed">Comprehensive Report</option>
-                        <option value="investor">Investor-Focused</option>
-                    </select>
-                    <label>Length Preference:</label>
-                    <select id="writer-length" class="config-select">
-                        <option value="medium">Medium (Default)</option>
-                        <option value="short">Short & Concise</option>
-                        <option value="long">Long & Detailed</option>
-                    </select>
+                    <div class="config-details" id="config-writer" style="display: none;">
+                        <label>Report Tone:</label>
+                        <select id="writer-style" class="config-select">
+                            <option value="professional">Professional (Default)</option>
+                            <option value="executive">Executive Summary Style</option>
+                            <option value="detailed">Comprehensive Report</option>
+                            <option value="investor">Investor-Focused</option>
+                        </select>
+                        <label>Length Preference:</label>
+                        <select id="writer-length" class="config-select">
+                            <option value="medium">Medium (Default)</option>
+                            <option value="short">Short & Concise</option>
+                            <option value="long">Long & Detailed</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="config-actions">
@@ -198,16 +218,10 @@
             </div>
         </div>
 
-        <!-- Tab Navigation -->
-        <div class="tabs" id="tabsContainer" style="display: none;">
-            <button class="tab-btn active" onclick="switchTab('summary')">Summary</button>
-            <button class="tab-btn" onclick="switchTab('agents')">Agent Details</button>
-        </div>
-
-        <!-- Tab Content -->
-        <div class="tab-content" id="tabContent" style="display: none;">
-            <!-- Summary Tab -->
-            <div id="summary-tab" class="tab-panel active">
+        <!-- Split View Content -->
+        <div class="split-view" id="splitView" style="display: none;">
+            <!-- Left Side: Summary -->
+            <div class="summary-section">
                 <div class="summary-card">
                     <h2 id="companyTitle">Company Analysis</h2>
                     <div class="status-badges">
@@ -234,8 +248,8 @@
                 </div>
             </div>
 
-            <!-- Agents Tab -->
-            <div id="agents-tab" class="tab-panel">
+            <!-- Right Side: Agent Tabs -->
+            <div class="agents-section">
                 <div class="agent-tabs">
                     <button class="agent-tab-btn active" onclick="switchAgentTab('researcher')">
                         <i data-lucide="search"></i> Researcher
@@ -306,6 +320,7 @@
                 </div>
             </div>
         </div>
+        <!-- End Split View -->
 
         <!-- Input Section (Bottom) -->
         <div class="input-section-bottom">

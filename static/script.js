@@ -65,6 +65,7 @@ async function startAnalysis() {
     }
 
     // Disable input and icons during analysis
+    const iconButtons = document.querySelectorAll('.icon-btn');
     companyInput.disabled = true;
     iconButtons.forEach(btn => btn.disabled = true);
 
@@ -78,9 +79,8 @@ async function startAnalysis() {
         }, 500);
     }
 
-    // Show progress and tabs
-    document.getElementById('tabsContainer').style.display = 'flex';
-    document.getElementById('tabContent').style.display = 'block';
+    // Show split view
+    document.getElementById('splitView').style.display = 'grid';
 
     // Update company title
     document.getElementById('companyTitle').textContent = `${company} Analysis`;
@@ -130,9 +130,6 @@ function resetOutputs() {
 
     // Reset summary
     document.getElementById('summaryContent').innerHTML = '<p class="placeholder">Analysis in progress...</p>';
-
-    // Reset progress
-    updateProgress(0);
 }
 
 // Poll for status updates
@@ -306,8 +303,13 @@ function updateProgress(percent) {
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
 
-    progressBar.style.setProperty('--progress', `${percent}%`);
-    progressText.textContent = `${percent}%`;
+    // Only update if elements exist (they may not be in split view)
+    if (progressBar) {
+        progressBar.style.setProperty('--progress', `${percent}%`);
+    }
+    if (progressText) {
+        progressText.textContent = `${percent}%`;
+    }
 }
 
 // Configuration functions
@@ -318,6 +320,21 @@ function toggleConfig() {
         loadConfig();
     } else {
         panel.style.display = 'none';
+    }
+}
+
+function toggleAgentConfig(agentName) {
+    const details = document.getElementById(`config-${agentName}`);
+    const parent = details.parentElement;
+
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        details.classList.add('show');
+        parent.classList.add('expanded');
+    } else {
+        details.style.display = 'none';
+        details.classList.remove('show');
+        parent.classList.remove('expanded');
     }
 }
 

@@ -482,9 +482,9 @@ button:disabled {
     background: rgba(15, 15, 15, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
-    max-width: 900px;
+    max-width: 600px;
     width: 90%;
-    max-height: 85vh;
+    max-height: 80vh;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -570,32 +570,84 @@ button:disabled {
 }
 
 .config-content {
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-}
-
-.agent-config {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-.config-title {
+.agent-config-compact {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.agent-config-compact:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.config-title-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.config-title-compact:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.config-title-left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 400;
-    margin-bottom: 1.25rem;
     color: #fff;
 }
 
-.config-title svg {
-    width: 20px;
-    height: 20px;
+.config-title-left svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+}
+
+.chevron-icon {
+    width: 18px;
+    height: 18px;
+    color: #888;
+    transition: transform 0.3s ease;
+}
+
+.agent-config-compact.expanded .chevron-icon {
+    transform: rotate(180deg);
+}
+
+.config-details {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.config-details.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .agent-config label {
@@ -638,12 +690,11 @@ button:disabled {
 }
 
 .config-actions {
-    grid-column: 1 / -1;
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     justify-content: flex-end;
-    margin-top: 1rem;
-    padding-top: 1.5rem;
+    margin-top: 0.5rem;
+    padding: 1rem 1.5rem 0.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -699,6 +750,24 @@ button:disabled {
     font-size: 0.85rem;
     font-weight: 300;
     color: #888;
+}
+
+/* Split View Layout */
+.split-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.summary-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.agents-section {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Tabs */
@@ -844,14 +913,14 @@ button:disabled {
 .agent-tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
-    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
 }
 
 .agent-content {
-    max-width: 900px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .agent-tab-btn {
@@ -1082,12 +1151,17 @@ button:disabled {
         font-size: 2rem;
     }
 
+    .split-view {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
     .tabs {
         flex-direction: column;
     }
 
     .agent-tabs {
-        flex-direction: column;
+        flex-wrap: wrap;
     }
 
     .summary-card {
