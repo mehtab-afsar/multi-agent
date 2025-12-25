@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Analysis System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Multi-Agent Analysis</h1>
+            <p class="subtitle">Intelligent Research • Real-Time Insights • Automated Reports</p>
+        </header>
+
+        <!-- Configuration Panel -->
+        <div id="configPanel" class="config-panel" style="display: none;">
+            <div class="config-header">
+                <h3><i data-lucide="sliders"></i> Agent Configuration</h3>
+                <button class="close-btn" onclick="toggleConfig()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="config-content">
+                <!-- Researcher Config -->
+                <div class="agent-config">
+                    <div class="config-title">
+                        <i data-lucide="search"></i>
+                        <span>Researcher Agent</span>
+                    </div>
+                    <label>Output Style:</label>
+                    <select id="researcher-style" class="config-select">
+                        <option value="bullets">Bullet Points (Default)</option>
+                        <option value="detailed">Detailed Paragraphs</option>
+                        <option value="concise">Ultra Concise</option>
+                        <option value="technical">Technical Deep Dive</option>
+                    </select>
+                    <label>Focus Area:</label>
+                    <input type="text" id="researcher-focus" class="config-input" placeholder="e.g., recent product launches, partnerships">
+                </div>
+
+                <!-- Financial Agent Config -->
+                <div class="agent-config">
+                    <div class="config-title">
+                        <i data-lucide="trending-up"></i>
+                        <span>Financial Analyst Agent</span>
+                    </div>
+                    <label>Analysis Depth:</label>
+                    <select id="financial-style" class="config-select">
+                        <option value="standard">Standard Metrics</option>
+                        <option value="detailed">Detailed Financial Analysis</option>
+                        <option value="ratios">Focus on Ratios & Valuation</option>
+                        <option value="growth">Growth & Revenue Focus</option>
+                    </select>
+                    <label>Additional Metrics:</label>
+                    <input type="text" id="financial-focus" class="config-input" placeholder="e.g., P/E ratio, debt levels, cash flow">
+                </div>
+
+                <!-- Strategic Agent Config -->
+                <div class="agent-config">
+                    <div class="config-title">
+                        <i data-lucide="target"></i>
+                        <span>Strategic Analyst Agent</span>
+                    </div>
+                    <label>Analysis Framework:</label>
+                    <select id="strategic-style" class="config-select">
+                        <option value="balanced">Balanced (Default)</option>
+                        <option value="swot">SWOT Analysis</option>
+                        <option value="competitive">Competitive Positioning</option>
+                        <option value="future">Future Outlook Focus</option>
+                    </select>
+                    <label>Industry Context:</label>
+                    <input type="text" id="strategic-focus" class="config-input" placeholder="e.g., compare with competitors, market trends">
+                </div>
+
+                <!-- Report Writer Config -->
+                <div class="agent-config">
+                    <div class="config-title">
+                        <i data-lucide="file-text"></i>
+                        <span>Report Writer Agent</span>
+                    </div>
+                    <label>Report Tone:</label>
+                    <select id="writer-style" class="config-select">
+                        <option value="professional">Professional (Default)</option>
+                        <option value="executive">Executive Summary Style</option>
+                        <option value="detailed">Comprehensive Report</option>
+                        <option value="investor">Investor-Focused</option>
+                    </select>
+                    <label>Length Preference:</label>
+                    <select id="writer-length" class="config-select">
+                        <option value="medium">Medium (Default)</option>
+                        <option value="short">Short & Concise</option>
+                        <option value="long">Long & Detailed</option>
+                    </select>
+                </div>
+
+                <div class="config-actions">
+                    <button class="secondary-btn" onclick="resetConfig()">Reset to Defaults</button>
+                    <button class="primary-btn" onclick="saveConfig()">Save Configuration</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="companyInput"
+                    placeholder="Enter company name (e.g., NVIDIA, Tesla, Microsoft)"
+                    autocomplete="off"
+                >
+                <div class="input-icons">
+                    <button class="icon-btn" onclick="toggleConfig()" title="Settings">
+                        <i data-lucide="settings"></i>
+                    </button>
+                    <button class="icon-btn" onclick="startAnalysis()" title="Start Analysis (Enter)">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="tabsContainer" style="display: none;">
+            <button class="tab-btn active" onclick="switchTab('summary')">Summary</button>
+            <button class="tab-btn" onclick="switchTab('agents')">Agent Details</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="tabContent" style="display: none;">
+            <!-- Summary Tab -->
+            <div id="summary-tab" class="tab-panel active">
+                <div class="summary-card">
+                    <h2 id="companyTitle">Company Analysis</h2>
+                    <div class="status-badges">
+                        <span class="badge" id="badge-researcher">
+                            <i data-lucide="search" class="badge-icon"></i>
+                            <span class="dot"></span> Researcher
+                        </span>
+                        <span class="badge" id="badge-financial">
+                            <i data-lucide="trending-up" class="badge-icon"></i>
+                            <span class="dot"></span> Financial
+                        </span>
+                        <span class="badge" id="badge-strategic">
+                            <i data-lucide="target" class="badge-icon"></i>
+                            <span class="dot"></span> Strategic
+                        </span>
+                        <span class="badge" id="badge-writer">
+                            <i data-lucide="file-text" class="badge-icon"></i>
+                            <span class="dot"></span> Writer
+                        </span>
+                    </div>
+                    <div class="summary-content" id="summaryContent">
+                        <p class="placeholder">Enter a company name to begin analysis...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agents Tab -->
+            <div id="agents-tab" class="tab-panel">
+                <div class="agent-tabs">
+                    <button class="agent-tab-btn active" onclick="switchAgentTab('researcher')">
+                        <i data-lucide="search"></i> Researcher
+                    </button>
+                    <button class="agent-tab-btn" onclick="switchAgentTab('financial')">
+                        <i data-lucide="trending-up"></i> Financial Analyst
+                    </button>
+                    <button class="agent-tab-btn" onclick="switchAgentTab('strategic')">
+                        <i data-lucide="target"></i> Strategic Analyst
+                    </button>
+                    <button class="agent-tab-btn" onclick="switchAgentTab('writer')">
+                        <i data-lucide="file-text"></i> Report Writer
+                    </button>
+                </div>
+
+                <div class="agent-content">
+                    <div id="researcher-panel" class="agent-panel active">
+                        <div class="agent-header">
+                            <i data-lucide="search" class="agent-icon"></i>
+                            <div>
+                                <h3>Researcher Agent</h3>
+                                <p class="agent-description">Searches web for latest news and developments</p>
+                            </div>
+                        </div>
+                        <div class="agent-output" id="researcher-output">
+                            <p class="placeholder">Waiting to start...</p>
+                        </div>
+                    </div>
+
+                    <div id="financial-panel" class="agent-panel">
+                        <div class="agent-header">
+                            <i data-lucide="trending-up" class="agent-icon"></i>
+                            <div>
+                                <h3>Financial Analyst Agent</h3>
+                                <p class="agent-description">Analyzes financial metrics and market data</p>
+                            </div>
+                        </div>
+                        <div class="agent-output" id="financial-output">
+                            <p class="placeholder">Waiting to start...</p>
+                        </div>
+                    </div>
+
+                    <div id="strategic-panel" class="agent-panel">
+                        <div class="agent-header">
+                            <i data-lucide="target" class="agent-icon"></i>
+                            <div>
+                                <h3>Strategic Analyst Agent</h3>
+                                <p class="agent-description">Provides strategic insights and recommendations</p>
+                            </div>
+                        </div>
+                        <div class="agent-output" id="strategic-output">
+                            <p class="placeholder">Waiting to start...</p>
+                        </div>
+                    </div>
+
+                    <div id="writer-panel" class="agent-panel">
+                        <div class="agent-header">
+                            <i data-lucide="file-text" class="agent-icon"></i>
+                            <div>
+                                <h3>Report Writer Agent</h3>
+                                <p class="agent-description">Compiles final executive report</p>
+                            </div>
+                        </div>
+                        <div class="agent-output" id="writer-output">
+                            <p class="placeholder">Waiting to start...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Re-initialize icons after dynamic updates
+        setInterval(() => {
+            lucide.createIcons();
+        }, 500);
+    </script>
+</body>
+</html>
