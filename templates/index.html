@@ -218,50 +218,71 @@
             </div>
         </div>
 
-        <!-- Split View Content -->
-        <div class="split-view" id="splitView" style="display: none;">
-            <!-- Left Side: Summary -->
-            <div class="summary-section">
+        <!-- Analysis Content -->
+        <div class="analysis-content" id="analysisContent" style="display: none;">
+            <h2 id="companyTitle">Company Analysis</h2>
+
+            <div class="status-badges">
+                <span class="badge" id="badge-researcher">
+                    <i data-lucide="search" class="badge-icon"></i>
+                    <span class="dot"></span> Researcher
+                </span>
+                <span class="badge" id="badge-financial">
+                    <i data-lucide="trending-up" class="badge-icon"></i>
+                    <span class="dot"></span> Financial
+                </span>
+                <span class="badge" id="badge-strategic">
+                    <i data-lucide="target" class="badge-icon"></i>
+                    <span class="dot"></span> Strategic
+                </span>
+                <span class="badge" id="badge-writer">
+                    <i data-lucide="file-text" class="badge-icon"></i>
+                    <span class="dot"></span> Writer
+                </span>
+            </div>
+
+            <!-- Main Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('summary')">
+                    <i data-lucide="layout-dashboard"></i> Summary
+                </button>
+                <button class="tab-btn" onclick="switchTab('agents')">
+                    <i data-lucide="users"></i> Agents
+                </button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div id="summary-tab" class="tab-panel active">
                 <div class="summary-card">
-                    <h2 id="companyTitle">Company Analysis</h2>
-                    <div class="status-badges">
-                        <span class="badge" id="badge-researcher">
-                            <i data-lucide="search" class="badge-icon"></i>
-                            <span class="dot"></span> Researcher
-                        </span>
-                        <span class="badge" id="badge-financial">
-                            <i data-lucide="trending-up" class="badge-icon"></i>
-                            <span class="dot"></span> Financial
-                        </span>
-                        <span class="badge" id="badge-strategic">
-                            <i data-lucide="target" class="badge-icon"></i>
-                            <span class="dot"></span> Strategic
-                        </span>
-                        <span class="badge" id="badge-writer">
-                            <i data-lucide="file-text" class="badge-icon"></i>
-                            <span class="dot"></span> Writer
-                        </span>
+                    <!-- Progress Bar -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                        <span class="progress-text" id="progressText">0%</span>
                     </div>
+
                     <div class="summary-content" id="summaryContent">
-                        <p class="placeholder">Enter a company name to begin analysis...</p>
+                        <p class="placeholder">Analysis in progress...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Side: Agent Tabs -->
-            <div class="agents-section">
+            <div id="agents-tab" class="tab-panel">
                 <div class="agent-tabs">
                     <button class="agent-tab-btn active" onclick="switchAgentTab('researcher')">
-                        <i data-lucide="search"></i> Researcher
+                        <i data-lucide="search"></i>
+                        <span>Researcher</span>
                     </button>
                     <button class="agent-tab-btn" onclick="switchAgentTab('financial')">
-                        <i data-lucide="trending-up"></i> Financial Analyst
+                        <i data-lucide="trending-up"></i>
+                        <span>Financial</span>
                     </button>
                     <button class="agent-tab-btn" onclick="switchAgentTab('strategic')">
-                        <i data-lucide="target"></i> Strategic Analyst
+                        <i data-lucide="target"></i>
+                        <span>Strategic</span>
                     </button>
                     <button class="agent-tab-btn" onclick="switchAgentTab('writer')">
-                        <i data-lucide="file-text"></i> Report Writer
+                        <i data-lucide="file-text"></i>
+                        <span>Report Writer</span>
                     </button>
                 </div>
 
@@ -320,7 +341,6 @@
                 </div>
             </div>
         </div>
-        <!-- End Split View -->
 
         <!-- Input Section (Bottom) -->
         <div class="input-section-bottom">

@@ -240,6 +240,8 @@ def run_analysis(company):
     try:
         analysis_results['status'] = 'running'
         analysis_results['company'] = company
+        analysis_results['summary'] = ''
+        analysis_results['progress'] = 0
 
         # Reset all agents
         for agent in ['researcher', 'financial', 'strategic', 'writer']:

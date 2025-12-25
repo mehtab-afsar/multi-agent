@@ -79,8 +79,8 @@ async function startAnalysis() {
         }, 500);
     }
 
-    // Show split view
-    document.getElementById('splitView').style.display = 'grid';
+    // Show analysis content
+    document.getElementById('analysisContent').style.display = 'block';
 
     // Update company title
     document.getElementById('companyTitle').textContent = `${company} Analysis`;
@@ -128,8 +128,18 @@ function resetOutputs() {
         output.innerHTML = '<p class="placeholder">Waiting to start...</p>';
     });
 
-    // Reset summary
+    // Reset summary and progress bar
     document.getElementById('summaryContent').innerHTML = '<p class="placeholder">Analysis in progress...</p>';
+
+    // Reset progress bar
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    if (progressBar) {
+        progressBar.style.setProperty('--progress', '0%');
+    }
+    if (progressText) {
+        progressText.textContent = '0%';
+    }
 }
 
 // Poll for status updates
@@ -205,34 +215,11 @@ function updateUI(data) {
 
 // Create elaborate summary display
 function createElaborateSummary(data) {
-    const agentStatuses = {
-        researcher: data.researcher?.status || 'pending',
-        financial: data.financial?.status || 'pending',
-        strategic: data.strategic?.status || 'pending',
-        writer: data.writer?.status || 'pending'
-    };
-
-    const completedCount = Object.values(agentStatuses).filter(s => s === 'completed').length;
-    const totalAgents = 4;
-
-    let html = `
-        <div style="margin-bottom: 2rem;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; min-width: 120px;">
-                    <div style="font-size: 2rem; font-weight: 300; color: #00ff88;">${completedCount}/${totalAgents}</div>
-                    <div style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">Agents Complete</div>
-                </div>
-                <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; min-width: 120px;">
-                    <div style="font-size: 2rem; font-weight: 300; color: #ffd700;">${data.progress || 0}%</div>
-                    <div style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">Progress</div>
-                </div>
-            </div>
-        </div>
-    `;
+    let html = '';
 
     if (data.summary) {
-        html += `
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
+        html = `
+            <div>
                 <h3 style="font-size: 1.2rem; font-weight: 400; margin-bottom: 1rem; color: #fff;">Executive Summary</h3>
                 <div style="font-size: 1rem; line-height: 1.8; color: #ccc;">
                     ${formatOutput(data.summary)}
@@ -246,42 +233,71 @@ function createElaborateSummary(data) {
 
 // Create progress summary while analysis is running
 function createProgressSummary(data) {
-    const agentNames = {
-        researcher: 'Research Agent',
-        financial: 'Financial Agent',
-        strategic: 'Strategic Agent',
-        writer: 'Report Writer'
+    const agentConfig = {
+        researcher: { name: 'Research', icon: 'search', color: '#64c8ff' },
+        financial: { name: 'Financial', icon: 'trending-up', color: '#00ff88' },
+        strategic: { name: 'Strategic', icon: 'target', color: '#ffd700' },
+        writer: { name: 'Report', icon: 'file-text', color: '#ff6b9d' }
     };
 
-    let html = '<div style="text-align: center; margin: 2rem 0;"><p style="color: #888; font-size: 1rem; margin-bottom: 2rem;">Analysis in progress...</p>';
+    let html = '<div style="max-width: 600px; margin: 2rem auto;">';
 
-    html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">';
+    // Header
+    html += '<div style="text-align: center; margin-bottom: 2rem;">';
+    html += '<div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(100, 200, 255, 0.1); border: 1px solid rgba(100, 200, 255, 0.2); border-radius: 24px;">';
+    html += '<div class="spinner" style="width: 16px; height: 16px; border: 2px solid rgba(100, 200, 255, 0.3); border-top-color: #64c8ff; border-radius: 50%; animation: spin 1s linear infinite;"></div>';
+    html += '<span style="color: #64c8ff; font-size: 0.9rem; font-weight: 400;">Processing Analysis</span>';
+    html += '</div></div>';
+
+    // Compact agent list
+    html += '<div style="display: flex; flex-direction: column; gap: 0.75rem;">';
 
     ['researcher', 'financial', 'strategic', 'writer'].forEach(agent => {
         const agentData = data[agent] || { status: 'pending' };
-        const statusEmoji = {
-            'pending': '⏳',
-            'working': '🔄',
-            'completed': '✅',
-            'error': '❌'
+        const config = agentConfig[agent];
+
+        const statusIcon = {
+            'pending': 'clock',
+            'working': 'loader',
+            'completed': 'check-circle',
+            'error': 'x-circle'
         };
+
         const statusColor = {
             'pending': '#666',
-            'working': '#ffd700',
+            'working': config.color,
             'completed': '#00ff88',
             'error': '#ff4444'
         };
 
+        const isWorking = agentData.status === 'working';
+        const isCompleted = agentData.status === 'completed';
+
         html += `
-            <div style="padding: 1.5rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; text-align: center;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${statusEmoji[agentData.status]}</div>
-                <div style="font-size: 0.9rem; color: ${statusColor[agentData.status]}; font-weight: 400; margin-bottom: 0.25rem;">${agentData.status.toUpperCase()}</div>
-                <div style="font-size: 0.85rem; color: #888;">${agentNames[agent]}</div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.03)'}; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 12px; transition: all 0.3s ease;">
+                <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, ${isCompleted ? 'rgba(0, 255, 136, 0.15)' : 'rgba(255, 255, 255, 0.05)'} 0%, ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.02)'} 100%); border-radius: 10px; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 255, 255, 0.1)'};">
+                    <i data-lucide="${config.icon}" style="width: 20px; height: 20px; color: ${isCompleted ? '#00ff88' : config.color};"></i>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.95rem; font-weight: 400; color: #fff; margin-bottom: 0.25rem;">${config.name} Agent</div>
+                    <div style="font-size: 0.8rem; color: #888; text-transform: capitalize;">${agentData.status}</div>
+                </div>
+                <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                    <i data-lucide="${statusIcon[agentData.status]}" style="width: 20px; height: 20px; color: ${statusColor[agentData.status]}; ${isWorking ? 'animation: spin 2s linear infinite;' : ''}"></i>
+                </div>
             </div>
         `;
     });
 
     html += '</div></div>';
+
+    // Add CSS for spinner animation
+    html += `<style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>`;
 
     return html;
 }
