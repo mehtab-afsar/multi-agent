@@ -65,13 +65,20 @@ async function startAnalysis() {
     }
 
     // Disable input and icons during analysis
-    const companyInput = document.getElementById('companyInput');
-    const iconButtons = document.querySelectorAll('.icon-btn');
     companyInput.disabled = true;
     iconButtons.forEach(btn => btn.disabled = true);
 
+    // Hide the agent flow diagram (landing page)
+    const agentFlow = document.getElementById('agentFlow');
+    if (agentFlow) {
+        agentFlow.classList.add('hide');
+        // Remove it from DOM after animation completes
+        setTimeout(() => {
+            agentFlow.style.display = 'none';
+        }, 500);
+    }
+
     // Show progress and tabs
-    document.getElementById('progressContainer').style.display = 'block';
     document.getElementById('tabsContainer').style.display = 'flex';
     document.getElementById('tabContent').style.display = 'block';
 

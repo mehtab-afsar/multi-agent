@@ -18,6 +18,97 @@
             <p class="subtitle">Intelligent Research • Real-Time Insights • Automated Reports</p>
         </header>
 
+        <!-- Agent Flow Diagram -->
+        <div class="agent-flow" id="agentFlow">
+            <div class="flow-container">
+                <!-- User Input Node -->
+                <div class="flow-node start-node">
+                    <div class="node-glow"></div>
+                    <i data-lucide="user"></i>
+                    <span>User Query</span>
+                    <p class="node-desc">Company Request</p>
+                </div>
+
+                <!-- Connection Line -->
+                <div class="flow-line-h">
+                    <div class="flow-particle"></div>
+                    <div class="flow-particle"></div>
+                    <div class="flow-particle"></div>
+                </div>
+
+                <!-- Researcher Agent -->
+                <div class="flow-node agent-node">
+                    <div class="node-glow"></div>
+                    <i data-lucide="search"></i>
+                    <span>Research</span>
+                    <p class="node-desc">News & Data</p>
+                </div>
+
+                <!-- Split Line -->
+                <div class="flow-split-h">
+                    <svg class="split-svg-h" viewBox="0 0 100 200" preserveAspectRatio="none">
+                        <path class="split-path" d="M 0 100 L 30 100 L 70 50 L 100 50" />
+                        <path class="split-path" d="M 30 100 L 70 150 L 100 150" />
+                    </svg>
+                    <div class="flow-particle split-particle-top"></div>
+                    <div class="flow-particle split-particle-bottom"></div>
+                </div>
+
+                <!-- Parallel Agents -->
+                <div class="flow-parallel-h">
+                    <div class="parallel-branch-h">
+                        <div class="flow-node agent-node">
+                            <div class="node-glow"></div>
+                            <i data-lucide="trending-up"></i>
+                            <span>Financial</span>
+                            <p class="node-desc">Metrics</p>
+                        </div>
+                    </div>
+                    <div class="parallel-branch-h">
+                        <div class="flow-node agent-node">
+                            <div class="node-glow"></div>
+                            <i data-lucide="target"></i>
+                            <span>Strategic</span>
+                            <p class="node-desc">Insights</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Merge Line -->
+                <div class="flow-merge-h">
+                    <svg class="merge-svg-h" viewBox="0 0 100 200" preserveAspectRatio="none">
+                        <path class="merge-path" d="M 0 50 L 30 50 L 70 100 L 100 100" />
+                        <path class="merge-path" d="M 0 150 L 30 150 L 70 100" />
+                    </svg>
+                    <div class="flow-particle merge-particle-top"></div>
+                    <div class="flow-particle merge-particle-bottom"></div>
+                </div>
+
+                <!-- Writer Agent -->
+                <div class="flow-node agent-node">
+                    <div class="node-glow"></div>
+                    <i data-lucide="file-text"></i>
+                    <span>Writer</span>
+                    <p class="node-desc">Report</p>
+                </div>
+
+                <!-- Connection Line -->
+                <div class="flow-line-h">
+                    <div class="flow-particle"></div>
+                    <div class="flow-particle"></div>
+                    <div class="flow-particle"></div>
+                </div>
+
+                <!-- Output Node -->
+                <div class="flow-node end-node">
+                    <div class="node-glow"></div>
+                    <i data-lucide="file-check"></i>
+                    <span>Final Report</span>
+                    <p class="node-desc">Complete Analysis</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Configuration Panel -->
         <div id="configPanel" class="config-panel" style="display: none;">
             <div class="config-header">
@@ -105,32 +196,6 @@
                     <button class="primary-btn" onclick="saveConfig()">Save Configuration</button>
                 </div>
             </div>
-        </div>
-
-        <!-- Input Section -->
-        <div class="input-section">
-            <div class="input-wrapper">
-                <input
-                    type="text"
-                    id="companyInput"
-                    placeholder="Enter company name (e.g., NVIDIA, Tesla, Microsoft)"
-                    autocomplete="off"
-                >
-                <div class="input-icons">
-                    <button class="icon-btn" onclick="toggleConfig()" title="Settings">
-                        <i data-lucide="settings"></i>
-                    </button>
-                    <button class="icon-btn" onclick="startAnalysis()" title="Start Analysis (Enter)">
-                        <i data-lucide="arrow-up"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progressContainer" style="display: none;">
-            <div class="progress-bar" id="progressBar"></div>
-            <span class="progress-text" id="progressText">0%</span>
         </div>
 
         <!-- Tab Navigation -->
@@ -238,6 +303,26 @@
                             <p class="placeholder">Waiting to start...</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Section (Bottom) -->
+        <div class="input-section-bottom">
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="companyInput"
+                    placeholder="Enter company name (e.g., NVIDIA, Tesla, Microsoft)"
+                    autocomplete="off"
+                >
+                <div class="input-icons">
+                    <button class="icon-btn" onclick="toggleConfig()" title="Settings">
+                        <i data-lucide="settings"></i>
+                    </button>
+                    <button class="icon-btn" onclick="startAnalysis()" title="Start Analysis (Enter)">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
                 </div>
             </div>
         </div>
