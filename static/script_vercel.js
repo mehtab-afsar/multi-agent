@@ -144,7 +144,8 @@ async function startAnalysis() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to complete analysis');
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `Server error: ${response.status}`);
         }
 
         const data = await response.json();

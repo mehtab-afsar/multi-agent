@@ -196,6 +196,11 @@ def index():
     # Use Vercel-specific script
     return render_template('index.html', use_vercel_script=True)
 
+@app.route('/test')
+def test():
+    # Diagnostic test page
+    return render_template('test.html')
+
 @app.route('/health')
 def health():
     """Health check endpoint"""

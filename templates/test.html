@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test - Multi-Agent System</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #1a4d1a; border: 1px solid #2d7a2d; }
+        .error { background: #4d1a1a; border: 1px solid #7a2d2d; }
+        .pending { background: #4d4d1a; border: 1px solid #7a7a2d; }
+        button {
+            background: #333;
+            color: #fff;
+            border: 1px solid #666;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #444; }
+        pre {
+            background: #111;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Multi-Agent System - API Diagnostics</h1>
+
+    <div class="test-section">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test /health Endpoint</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Environment Variables</h2>
+        <div id="env-result" class="status pending">Click "Test /health Endpoint" above to check</div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Analysis (Quick)</h2>
+        <button onclick="testAnalysis()">Test /analyze with Tesla</button>
+        <div id="analysis-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Deployment Info</h2>
+        <div id="deploy-info"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            const envDiv = document.getElementById('env-result');
+
+            resultDiv.innerHTML = '<div class="status pending">Testing...</div>';
+
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Health endpoint responding
+                    </div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+                // Check environment variables
+                if (data.groq_key_set && data.tavily_key_set) {
+                    envDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ GROQ_API_KEY: Set<br>
+                            ✅ TAVILY_API_KEY: Set
+                        </div>
+                    `;
+                } else {
+                    envDiv.innerHTML = `
+                        <div class="status error">
+                            ${data.groq_key_set ? '✅' : '❌'} GROQ_API_KEY: ${data.groq_key_set ? 'Set' : 'NOT SET'}<br>
+                            ${data.tavily_key_set ? '✅' : '❌'} TAVILY_API_KEY: ${data.tavily_key_set ? 'Set' : 'NOT SET'}
+                            <br><br>
+                            <strong>Action Required:</strong> Add missing environment variables in Vercel Dashboard
+                        </div>
+                    `;
+                }
+
+                // Show deployment info
+                document.getElementById('deploy-info').innerHTML = `
+                    <div class="status success">
+                        Python Version: ${data.python_version}<br>
+                        Template Folder: ${data.template_folder}<br>
+                        Static Folder: ${data.static_folder}
+                    </div>
+                `;
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Error: ${error.message}<br>
+                        This means the Flask app is not running or not accessible.
+                    </div>
+                `;
+                envDiv.innerHTML = `<div class="status error">Cannot check - health endpoint failed</div>`;
+            }
+        }
+
+        async function testAnalysis() {
+            const resultDiv = document.getElementById('analysis-result');
+
+            resultDiv.innerHTML = '<div class="status pending">⏳ Testing analysis... This will take 30-60 seconds...</div>';
+
+            const startTime = Date.now();
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        company: 'Tesla',
+                        config: {}
+                    })
+                });
+
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="status success">
+                        ✅ Analysis completed in ${duration} seconds<br>
+                        Status: ${data.status}<br>
+                        Company: ${data.company}
+                    </div>
+                    <details>
+                        <summary>View Full Response</summary>
+                        <pre>${JSON.stringify(data, null, 2).substring(0, 2000)}...</pre>
+                    </details>
+                `;
+
+            } catch (error) {
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Analysis failed after ${duration} seconds<br>
+                        Error: ${error.message}<br><br>
+                        <strong>Common causes:</strong><br>
+                        • Missing API keys (GROQ_API_KEY or TAVILY_API_KEY)<br>
+                        • Timeout (need Vercel Pro for 60s limit)<br>
+                        • Python dependencies not installed<br>
+                        • Import errors in backend code
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run health check on load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 500);
+        });
+    </script>
+</body>
+</html>
