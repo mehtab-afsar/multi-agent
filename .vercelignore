@@ -1,0 +1,8 @@
+*.txt
+.env
+.git
+.gitignore
+multi_agent.py
+__pycache__
+*.pyc
+.DS_Store
