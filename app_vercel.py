@@ -327,8 +327,11 @@ Format your responses with proper markdown:
         return jsonify({'response': answer})
 
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         print(f"ERROR in /chat: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        print(f"Full traceback:\n{error_details}")
+        return jsonify({'error': str(e), 'details': error_details}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

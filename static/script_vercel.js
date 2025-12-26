@@ -683,14 +683,18 @@ function toggleSidebar() {
 
 // Add conversation item to sidebar
 function addConversationToSidebar(question, answer) {
+    if (!question || !answer) return;
+
     const historyContainer = document.getElementById('conversationHistory');
+    if (!historyContainer) return;
 
     // Remove placeholder if exists
     const placeholder = historyContainer.querySelector('.placeholder-small');
     if (placeholder) placeholder.remove();
 
     // Add conversation item
-    const answerPreview = answer.substring(0, 50).replace(/<[^>]*>/g, '') + '...';
+    const answerText = String(answer || '');
+    const answerPreview = answerText.substring(0, 50).replace(/<[^>]*>/g, '') + '...';
     const itemHtml = `
         <div class="conversation-item">
             <div class="question">${escapeHtml(question.substring(0, 60))}${question.length > 60 ? '...' : ''}</div>
@@ -805,6 +809,12 @@ async function sendChatMessage() {
         const loadingMessage = messagesContainer.querySelector('.loading-message');
         if (loadingMessage) loadingMessage.remove();
 
+        // Try to get error details from response
+        let errorMsg = 'Sorry, I encountered an error. Please try again.';
+        if (error.message) {
+            errorMsg += `<br><br><small style="color: #ff6b6b;">${error.message}</small>`;
+        }
+
         // Show error message
         const errorMessageHtml = `
             <div class="chat-message assistant">
@@ -813,7 +823,7 @@ async function sendChatMessage() {
                 </div>
                 <div class="message-content">
                     <div class="message-bubble">
-                        Sorry, I encountered an error. Please try again.
+                        ${errorMsg}
                     </div>
                 </div>
             </div>
