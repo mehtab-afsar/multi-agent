@@ -1,12 +1,20 @@
 # app_vercel.py - Vercel-compatible Flask Backend (without threading)
 
 import os
+import sys
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from groq import Groq
 from tavily import TavilyClient
 
-app = Flask(__name__)
+# Get absolute paths for templates and static folders
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'templates')
+static_dir = os.path.join(current_dir, 'static')
+
+app = Flask(__name__,
+            template_folder=template_dir,
+            static_folder=static_dir)
 CORS(app)
 
 # Initialize clients lazily (only when needed)
@@ -193,6 +201,9 @@ def health():
     """Health check endpoint"""
     return jsonify({
         'status': 'ok',
+        'python_version': sys.version,
+        'template_folder': app.template_folder,
+        'static_folder': app.static_folder,
         'groq_key_set': bool(os.environ.get('GROQ_API_KEY')),
         'tavily_key_set': bool(os.environ.get('TAVILY_API_KEY'))
     })
