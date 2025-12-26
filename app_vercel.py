@@ -188,6 +188,15 @@ def index():
     # Use Vercel-specific script
     return render_template('index.html', use_vercel_script=True)
 
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'ok',
+        'groq_key_set': bool(os.environ.get('GROQ_API_KEY')),
+        'tavily_key_set': bool(os.environ.get('TAVILY_API_KEY'))
+    })
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     """Synchronous analysis endpoint for Vercel"""
