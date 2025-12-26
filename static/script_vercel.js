@@ -304,9 +304,16 @@ function updateUI(data) {
     lucide.createIcons();
 
     // After 1 second, switch to chat interface
+    console.log('Setting timeout to switch to chat interface...');
     setTimeout(() => {
-        const company = document.getElementById('companyTitle').textContent.replace(' Analysis', '');
-        switchToChatInterface(company, data);
+        const companyTitle = document.getElementById('companyTitle');
+        if (companyTitle) {
+            const company = companyTitle.textContent.replace(' Analysis', '');
+            console.log('Timeout executed, switching to chat for:', company);
+            switchToChatInterface(company, data);
+        } else {
+            console.error('Company title element not found');
+        }
     }, 1000);
 }
 
@@ -614,27 +621,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Switch to chat interface after analysis
 function switchToChatInterface(company, data) {
+    console.log('Switching to chat interface for:', company);
     currentCompany = company;
     analysisData = data;
 
-    // Hide initial elements
-    document.querySelector('header').style.display = 'none';
-    document.getElementById('agentFlow').style.display = 'none';
-    document.getElementById('analysisContent').style.display = 'none';
-    document.getElementById('initialInputSection').style.display = 'none';
+    // Hide only the header and agent flow diagram
+    const header = document.querySelector('header');
+    if (header) header.style.display = 'none';
 
-    // Show chat interface
-    document.getElementById('chatInterface').style.display = 'flex';
+    const agentFlow = document.getElementById('agentFlow');
+    if (agentFlow) agentFlow.style.display = 'none';
 
-    // Update company names
-    document.getElementById('sidebarCompanyName').textContent = company;
-    document.getElementById('chatCompanyName').textContent = company;
+    const initialInputSection = document.getElementById('initialInputSection');
+    if (initialInputSection) initialInputSection.style.display = 'none';
 
-    // Populate sidebar with summary
-    const sidebarSummary = document.getElementById('sidebarSummaryContent');
-    if (data.summary) {
-        sidebarSummary.innerHTML = formatOutput(data.summary).substring(0, 300) + '...';
+    // Keep analysisContent visible (summary + agents tabs)
+    const analysisContent = document.getElementById('analysisContent');
+    if (analysisContent) {
+        analysisContent.style.display = 'block';
+        analysisContent.style.marginBottom = '2rem';
     }
+
+    // Show chat interface below the analysis
+    const chatInterface = document.getElementById('chatInterface');
+    if (chatInterface) {
+        chatInterface.style.display = 'block';
+        chatInterface.style.position = 'relative';
+        chatInterface.style.height = 'auto';
+        chatInterface.style.minHeight = '500px';
+        console.log('Chat interface shown');
+    } else {
+        console.error('Chat interface element not found!');
+    }
+
+    // Update company name in chat
+    const chatName = document.getElementById('chatCompanyName');
+    if (chatName) chatName.textContent = company;
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Initialize icons
     lucide.createIcons();
@@ -645,63 +670,35 @@ function toggleSidebar() {
     const sidebar = document.getElementById('chatSidebar');
     sidebar.classList.toggle('collapsed');
 
-    const icon = document.querySelector('.sidebar-toggle-btn i');
-    if (sidebar.classList.contains('collapsed')) {
-        icon.setAttribute('data-lucide', 'panel-left-open');
-    } else {
-        icon.setAttribute('data-lucide', 'panel-left-close');
+    const icon = document.querySelector('.sidebar-toggle-btn-new i');
+    if (icon) {
+        if (sidebar.classList.contains('collapsed')) {
+            icon.setAttribute('data-lucide', 'panel-left-open');
+        } else {
+            icon.setAttribute('data-lucide', 'panel-left-close');
+        }
+        lucide.createIcons();
     }
-    lucide.createIcons();
 }
 
-// Switch sidebar tabs
-function switchSidebarTab(tabName) {
-    // Update buttons
-    document.querySelectorAll('.sidebar-tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.closest('.sidebar-tab-btn').classList.add('active');
+// Add conversation item to sidebar
+function addConversationToSidebar(question, answer) {
+    const historyContainer = document.getElementById('conversationHistory');
 
-    // Update panels
-    document.querySelectorAll('.sidebar-tab-panel').forEach(panel => {
-        panel.classList.remove('active');
-    });
-    document.getElementById(`sidebar-${tabName}`).classList.add('active');
+    // Remove placeholder if exists
+    const placeholder = historyContainer.querySelector('.placeholder-small');
+    if (placeholder) placeholder.remove();
 
-    lucide.createIcons();
-}
-
-// Show agent output in chat
-function showAgentInChat(agentName) {
-    const agentData = analysisData[agentName];
-    if (!agentData || !agentData.output) return;
-
-    const messagesContainer = document.getElementById('chatMessages');
-
-    // Remove welcome message if exists
-    const welcome = messagesContainer.querySelector('.chat-welcome');
-    if (welcome) welcome.remove();
-
-    // Add agent output as a message
-    const messageHtml = `
-        <div class="chat-message assistant">
-            <div class="message-avatar">
-                <i data-lucide="bot"></i>
-            </div>
-            <div class="message-content">
-                <div class="message-bubble">
-                    <strong>${agentName.charAt(0).toUpperCase() + agentName.slice(1)} Agent Output:</strong><br><br>
-                    ${formatOutput(agentData.output)}
-                </div>
-            </div>
+    // Add conversation item
+    const answerPreview = answer.substring(0, 50).replace(/<[^>]*>/g, '') + '...';
+    const itemHtml = `
+        <div class="conversation-item">
+            <div class="question">${escapeHtml(question.substring(0, 60))}${question.length > 60 ? '...' : ''}</div>
+            <div class="answer-preview">${escapeHtml(answerPreview)}</div>
         </div>
     `;
 
-    messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
-    lucide.createIcons();
-
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    historyContainer.insertAdjacentHTML('afterbegin', itemHtml);
 }
 
 // Send chat message
@@ -798,6 +795,9 @@ async function sendChatMessage() {
         lucide.createIcons();
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
+        // Add to conversation history in sidebar
+        addConversationToSidebar(message, data.response);
+
     } catch (error) {
         console.error('Chat error:', error);
 
@@ -826,22 +826,32 @@ async function sendChatMessage() {
 
 // Start new analysis
 function startNewAnalysis() {
-    // Hide chat interface
+    // Hide chat interface and analysis content
     document.getElementById('chatInterface').style.display = 'none';
+    const analysisContent = document.getElementById('analysisContent');
+    if (analysisContent) analysisContent.style.display = 'none';
 
     // Show initial elements
-    document.querySelector('header').style.display = 'block';
-    document.getElementById('agentFlow').style.display = 'block';
-    document.getElementById('initialInputSection').style.display = 'block';
+    const header = document.querySelector('header');
+    if (header) header.style.display = 'block';
 
-    // Clear chat
-    document.getElementById('chatMessages').innerHTML = `
-        <div class="chat-welcome">
-            <i data-lucide="message-circle"></i>
-            <h3>Ask questions about <span id="chatCompanyName">the company</span></h3>
-            <p>Drill deep into specific aspects of the analysis</p>
-        </div>
-    `;
+    const agentFlow = document.getElementById('agentFlow');
+    if (agentFlow) agentFlow.style.display = 'block';
+
+    const initialInputSection = document.getElementById('initialInputSection');
+    if (initialInputSection) initialInputSection.style.display = 'block';
+
+    // Clear chat messages
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '';
+    }
+
+    // Clear conversation history
+    const conversationHistory = document.getElementById('conversationHistory');
+    if (conversationHistory) {
+        conversationHistory.innerHTML = '<p class="placeholder-small">Ask questions to start a conversation</p>';
+    }
 
     // Clear input
     document.getElementById('companyInput').value = '';

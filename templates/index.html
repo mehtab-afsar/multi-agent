@@ -344,78 +344,47 @@
 
         <!-- Chat Interface (Hidden initially, shown after analysis) -->
         <div class="chat-interface" id="chatInterface" style="display: none;">
-            <!-- Collapsible Sidebar -->
-            <div class="chat-sidebar" id="chatSidebar">
-                <div class="sidebar-header">
-                    <h3 id="sidebarCompanyName">Company Analysis</h3>
-                    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
-                        <i data-lucide="panel-left-close"></i>
+            <div class="chat-container">
+                <!-- Sidebar for conversation history -->
+                <div class="chat-sidebar-new" id="chatSidebar">
+                    <div class="sidebar-header-new">
+                        <h4>Conversation</h4>
+                        <button class="sidebar-toggle-btn-new" onclick="toggleSidebar()">
+                            <i data-lucide="panel-left-close"></i>
+                        </button>
+                    </div>
+                    <div class="conversation-history" id="conversationHistory">
+                        <p class="placeholder-small">Ask questions to start a conversation</p>
+                    </div>
+                    <button class="new-analysis-btn" onclick="startNewAnalysis()">
+                        <i data-lucide="plus-circle"></i> New Analysis
                     </button>
                 </div>
 
-                <div class="sidebar-content">
-                    <!-- Mini Tabs -->
-                    <div class="sidebar-tabs">
-                        <button class="sidebar-tab-btn active" onclick="switchSidebarTab('summary')">
-                            <i data-lucide="layout-dashboard"></i> Summary
-                        </button>
-                        <button class="sidebar-tab-btn" onclick="switchSidebarTab('agents')">
-                            <i data-lucide="users"></i> Agents
-                        </button>
-                    </div>
-
-                    <!-- Summary Preview -->
-                    <div id="sidebar-summary" class="sidebar-tab-panel active">
-                        <div class="sidebar-summary-content" id="sidebarSummaryContent">
-                            <p class="placeholder">No analysis yet</p>
-                        </div>
-                    </div>
-
-                    <!-- Agents Preview -->
-                    <div id="sidebar-agents" class="sidebar-tab-panel">
-                        <div class="sidebar-agent-list">
-                            <button class="sidebar-agent-item" onclick="showAgentInChat('researcher')">
-                                <i data-lucide="search"></i> Researcher
-                            </button>
-                            <button class="sidebar-agent-item" onclick="showAgentInChat('financial')">
-                                <i data-lucide="trending-up"></i> Financial
-                            </button>
-                            <button class="sidebar-agent-item" onclick="showAgentInChat('strategic')">
-                                <i data-lucide="target"></i> Strategic
-                            </button>
-                            <button class="sidebar-agent-item" onclick="showAgentInChat('writer')">
-                                <i data-lucide="file-text"></i> Writer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="new-analysis-btn" onclick="startNewAnalysis()">
-                    <i data-lucide="plus-circle"></i> New Analysis
-                </button>
-            </div>
-
-            <!-- Main Chat Area -->
-            <div class="chat-main">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="chat-welcome">
-                        <i data-lucide="message-circle"></i>
+                <!-- Main Chat Section -->
+                <div class="chat-section">
+                    <div class="chat-header">
                         <h3>Ask questions about <span id="chatCompanyName">the company</span></h3>
                         <p>Drill deep into specific aspects of the analysis</p>
                     </div>
-                </div>
 
-                <!-- Chat Input (Bottom) -->
-                <div class="chat-input-section">
-                    <div class="chat-input-wrapper">
-                        <textarea
-                            id="chatInput"
-                            placeholder="Ask a follow-up question..."
-                            rows="1"
-                        ></textarea>
-                        <button class="chat-send-btn" onclick="sendChatMessage()" title="Send (Enter)">
-                            <i data-lucide="send"></i>
-                        </button>
+                    <!-- Chat Messages -->
+                    <div class="chat-messages-new" id="chatMessages">
+                        <!-- Messages will appear here -->
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-section-new">
+                        <div class="chat-input-wrapper-new">
+                            <textarea
+                                id="chatInput"
+                                placeholder="Ask a follow-up question..."
+                                rows="1"
+                            ></textarea>
+                            <button class="chat-send-btn-new" onclick="sendChatMessage()" title="Send (Enter)">
+                                <i data-lucide="send"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
