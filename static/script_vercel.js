@@ -150,7 +150,13 @@ async function startAnalysis() {
 
         const data = await response.json();
 
+        // Clear the simulated progress interval
+        if (window.progressSimulationInterval) {
+            clearInterval(window.progressSimulationInterval);
+        }
+
         // Update UI with complete results
+        updateProgress(100);
         updateUI(data);
 
     } catch (error) {
@@ -172,22 +178,75 @@ async function startAnalysis() {
     }
 }
 
-// Show loading state
+// Show loading state with simulated progress
 function showLoadingState() {
     const agents = ['researcher', 'financial', 'strategic', 'writer'];
+    let simulatedProgress = 0;
+    let lastAgentState = null;
+    let progressInitialized = false;
 
-    // Show progress in summary
-    const progressSummary = createProgressSummary({
+    // Initial state - all pending except first one working
+    const initialState = {
         researcher: { status: 'working' },
         financial: { status: 'pending' },
         strategic: { status: 'pending' },
         writer: { status: 'pending' }
-    });
+    };
+
+    const progressSummary = createProgressSummary(initialState);
     document.getElementById('summaryContent').innerHTML = progressSummary;
     lucide.createIcons();
+    progressInitialized = true;
+    lastAgentState = JSON.stringify(initialState);
 
     // Update progress bar
-    updateProgress(10);
+    updateProgress(5);
+
+    // Simulate progress updates (only update UI when agent states change)
+    const progressInterval = setInterval(() => {
+        simulatedProgress += 1.5;
+
+        // Cap at 95% (save last 5% for actual completion)
+        if (simulatedProgress < 95) {
+            // Always update progress bar smoothly
+            updateProgress(Math.min(simulatedProgress, 95));
+
+            // Determine agent states based on progress
+            let agentStates = {
+                researcher: { status: 'pending' },
+                financial: { status: 'pending' },
+                strategic: { status: 'pending' },
+                writer: { status: 'pending' }
+            };
+
+            if (simulatedProgress > 5) agentStates.researcher = { status: 'working' };
+            if (simulatedProgress > 25) {
+                agentStates.researcher = { status: 'completed' };
+                agentStates.financial = { status: 'working' };
+            }
+            if (simulatedProgress > 50) {
+                agentStates.financial = { status: 'completed' };
+                agentStates.strategic = { status: 'working' };
+            }
+            if (simulatedProgress > 75) {
+                agentStates.strategic = { status: 'completed' };
+                agentStates.writer = { status: 'working' };
+            }
+
+            // Only update UI if agent states actually changed (prevents blinking)
+            const currentAgentState = JSON.stringify(agentStates);
+            if (currentAgentState !== lastAgentState) {
+                // Use updateProgressDisplay instead of recreating everything
+                updateProgressDisplay(agentStates);
+                lastAgentState = currentAgentState;
+            }
+        } else {
+            clearInterval(progressInterval);
+        }
+    }, 100); // Check more frequently but only update DOM when state changes
+
+    // Store interval ID so we can clear it when analysis completes
+    window.progressSimulationInterval = progressInterval;
 }
 
 // Reset outputs
@@ -243,6 +302,12 @@ function updateUI(data) {
 
     // Reinitialize icons
     lucide.createIcons();
+
+    // After 1 second, switch to chat interface
+    setTimeout(() => {
+        const company = document.getElementById('companyTitle').textContent.replace(' Analysis', '');
+        switchToChatInterface(company, data);
+    }, 1000);
 }
 
 // Update progress bar
@@ -265,7 +330,7 @@ function createElaborateSummary(data) {
     if (data.summary) {
         html = `
             <div>
-                <h3 style="font-size: 1.2rem; font-weight: 400; margin-bottom: 1rem; color: #fff;">Executive Summary</h3>
+                <h3 style="font-size: 1.2rem; font-weight: 400; margin-bottom: 1rem; color: #fff; text-align: center;">Executive Summary</h3>
                 <div style="font-size: 1rem; line-height: 1.8; color: #ccc;">
                     ${formatOutput(data.summary)}
                 </div>
@@ -274,6 +339,88 @@ function createElaborateSummary(data) {
     }
 
     return html;
+}
+
+// Update progress display without recreating icons (prevents blinking)
+function updateProgressDisplay(data) {
+    const agentConfig = {
+        researcher: { name: 'Research', icon: 'search', color: '#64c8ff' },
+        financial: { name: 'Financial', icon: 'trending-up', color: '#00ff88' },
+        strategic: { name: 'Strategic', icon: 'target', color: '#ffd700' },
+        writer: { name: 'Report', icon: 'file-text', color: '#ff6b9d' }
+    };
+
+    ['researcher', 'financial', 'strategic', 'writer'].forEach((agent, index) => {
+        const agentData = data[agent] || { status: 'pending' };
+        const config = agentConfig[agent];
+        const isCompleted = agentData.status === 'completed';
+        const isWorking = agentData.status === 'working';
+
+        // Update the agent card in the progress summary
+        const agentCards = document.querySelectorAll('#summaryContent .agent-progress-card');
+        if (agentCards[index]) {
+            const card = agentCards[index];
+
+            // Update background and border with smooth transition
+            card.style.transition = 'all 0.5s ease';
+            if (isCompleted) {
+                card.style.background = 'rgba(0, 255, 136, 0.05)';
+                card.style.borderColor = 'rgba(0, 255, 136, 0.2)';
+            } else {
+                card.style.background = 'rgba(255, 255, 255, 0.03)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            }
+
+            // Update icon container
+            const iconContainer = card.querySelector('.agent-icon-container');
+            if (iconContainer) {
+                iconContainer.style.transition = 'all 0.5s ease';
+                if (isCompleted) {
+                    iconContainer.style.background = 'linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%)';
+                    iconContainer.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                } else {
+                    iconContainer.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)';
+                    iconContainer.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                }
+
+                // Update icon color
+                const agentIcon = iconContainer.querySelector('svg');
+                if (agentIcon) {
+                    agentIcon.style.transition = 'color 0.5s ease';
+                    agentIcon.style.color = isCompleted ? '#00ff88' : config.color;
+                }
+            }
+
+            // Update status text
+            const statusText = card.querySelector('.agent-status-text');
+            if (statusText) {
+                statusText.textContent = agentData.status.charAt(0).toUpperCase() + agentData.status.slice(1);
+            }
+
+            // Update status icon color and animation without recreating
+            const statusIconContainer = card.querySelector('.agent-status-icon');
+            if (statusIconContainer) {
+                const statusColor = {
+                    'pending': '#666',
+                    'working': config.color,
+                    'completed': '#00ff88',
+                    'error': '#ff4444'
+                };
+
+                const statusSvg = statusIconContainer.querySelector('svg');
+                if (statusSvg) {
+                    statusSvg.style.transition = 'color 0.5s ease';
+                    statusSvg.style.color = statusColor[agentData.status];
+
+                    if (isWorking) {
+                        statusSvg.style.animation = 'spin 2s linear infinite';
+                    } else {
+                        statusSvg.style.animation = '';
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Create progress summary while analysis is running
@@ -319,15 +466,15 @@ function createProgressSummary(data) {
         const isCompleted = agentData.status === 'completed';
 
         html += `
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.03)'}; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 12px; transition: all 0.3s ease;">
-                <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, ${isCompleted ? 'rgba(0, 255, 136, 0.15)' : 'rgba(255, 255, 255, 0.05)'} 0%, ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.02)'} 100%); border-radius: 10px; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 255, 255, 0.1)'};">
+            <div class="agent-progress-card" style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.03)'}; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.2)' : 'rgba(255, 255, 255, 0.08)'}; border-radius: 12px; transition: all 0.3s ease;">
+                <div class="agent-icon-container" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, ${isCompleted ? 'rgba(0, 255, 136, 0.15)' : 'rgba(255, 255, 255, 0.05)'} 0%, ${isCompleted ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255, 255, 255, 0.02)'} 100%); border-radius: 10px; border: 1px solid ${isCompleted ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 255, 255, 0.1)'};">
                     <i data-lucide="${config.icon}" style="width: 20px; height: 20px; color: ${isCompleted ? '#00ff88' : config.color};"></i>
                 </div>
                 <div style="flex: 1; min-width: 0;">
                     <div style="font-size: 0.95rem; font-weight: 400; color: #fff; margin-bottom: 0.25rem;">${config.name} Agent</div>
-                    <div style="font-size: 0.8rem; color: #888; text-transform: capitalize;">${agentData.status}</div>
+                    <div class="agent-status-text" style="font-size: 0.8rem; color: #888; text-transform: capitalize;">${agentData.status}</div>
                 </div>
-                <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                <div class="agent-status-icon" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                     <i data-lucide="${statusIcon[agentData.status]}" style="width: 20px; height: 20px; color: ${statusColor[agentData.status]}; ${isWorking ? 'animation: spin 2s linear infinite;' : ''}"></i>
                 </div>
             </div>
@@ -347,15 +494,93 @@ function createProgressSummary(data) {
     return html;
 }
 
-// Format output text
+// Format output text with rich markdown formatting (ChatGPT-style)
 function formatOutput(text) {
-    // Convert markdown-style formatting to HTML
+    if (!text) return '';
+
+    // Split into paragraphs first
+    let paragraphs = text.split('\n\n');
+
+    let formatted = paragraphs.map(para => {
+        // Skip empty paragraphs
+        if (!para.trim()) return '';
+
+        // Headers (## for h2, ### for h3)
+        if (para.startsWith('### ')) {
+            return `<h3 class="output-h3">${para.substring(4)}</h3>`;
+        }
+        if (para.startsWith('## ')) {
+            return `<h2 class="output-h2">${para.substring(3)}</h2>`;
+        }
+        if (para.startsWith('# ')) {
+            return `<h1 class="output-h1">${para.substring(2)}</h1>`;
+        }
+
+        // Bullet lists (lines starting with - or *)
+        if (para.match(/^[\-\*]\s/m)) {
+            let items = para.split('\n')
+                .filter(line => line.trim())
+                .map(line => {
+                    if (line.match(/^[\-\*]\s/)) {
+                        return `<li>${formatInline(line.substring(2))}</li>`;
+                    }
+                    return line;
+                })
+                .join('');
+            return `<ul class="output-list">${items}</ul>`;
+        }
+
+        // Numbered lists (lines starting with 1. 2. etc)
+        if (para.match(/^\d+\.\s/m)) {
+            let items = para.split('\n')
+                .filter(line => line.trim())
+                .map(line => {
+                    if (line.match(/^\d+\.\s/)) {
+                        return `<li>${formatInline(line.replace(/^\d+\.\s/, ''))}</li>`;
+                    }
+                    return line;
+                })
+                .join('');
+            return `<ol class="output-list">${items}</ol>`;
+        }
+
+        // Code blocks (```...```)
+        if (para.startsWith('```')) {
+            let code = para.replace(/```\w*\n?/, '').replace(/```$/, '');
+            return `<pre class="output-code"><code>${escapeHtml(code)}</code></pre>`;
+        }
+
+        // Regular paragraphs
+        return `<p class="output-paragraph">${formatInline(para)}</p>`;
+    }).join('');
+
+    return formatted;
+}
+
+// Format inline elements (bold, italic, inline code, links)
+function formatInline(text) {
     return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n\n/g, '</p><p>')
+        // Bold (**text**)
+        .replace(/\*\*(.+?)\*\*/g, '<strong class="output-bold">$1</strong>')
+        // Italic (*text*)
+        .replace(/\*(.+?)\*/g, '<em class="output-italic">$1</em>')
+        // Inline code (`code`)
+        .replace(/`(.+?)`/g, '<code class="output-inline-code">$1</code>')
+        // Line breaks
         .replace(/\n/g, '<br>');
 }
+
+// Escape HTML for code blocks
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Global state for chat
+let currentCompany = '';
+let analysisData = {};
+let chatHistory = [];
 
 // Enter key support
 document.addEventListener('DOMContentLoaded', () => {
@@ -368,4 +593,263 @@ document.addEventListener('DOMContentLoaded', () => {
             startAnalysis();
         }
     });
+
+    // Chat input enter key
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = chatInput.scrollHeight + 'px';
+        });
+    }
 });
+
+// Switch to chat interface after analysis
+function switchToChatInterface(company, data) {
+    currentCompany = company;
+    analysisData = data;
+
+    // Hide initial elements
+    document.querySelector('header').style.display = 'none';
+    document.getElementById('agentFlow').style.display = 'none';
+    document.getElementById('analysisContent').style.display = 'none';
+    document.getElementById('initialInputSection').style.display = 'none';
+
+    // Show chat interface
+    document.getElementById('chatInterface').style.display = 'flex';
+
+    // Update company names
+    document.getElementById('sidebarCompanyName').textContent = company;
+    document.getElementById('chatCompanyName').textContent = company;
+
+    // Populate sidebar with summary
+    const sidebarSummary = document.getElementById('sidebarSummaryContent');
+    if (data.summary) {
+        sidebarSummary.innerHTML = formatOutput(data.summary).substring(0, 300) + '...';
+    }
+
+    // Initialize icons
+    lucide.createIcons();
+}
+
+// Toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('chatSidebar');
+    sidebar.classList.toggle('collapsed');
+
+    const icon = document.querySelector('.sidebar-toggle-btn i');
+    if (sidebar.classList.contains('collapsed')) {
+        icon.setAttribute('data-lucide', 'panel-left-open');
+    } else {
+        icon.setAttribute('data-lucide', 'panel-left-close');
+    }
+    lucide.createIcons();
+}
+
+// Switch sidebar tabs
+function switchSidebarTab(tabName) {
+    // Update buttons
+    document.querySelectorAll('.sidebar-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.sidebar-tab-btn').classList.add('active');
+
+    // Update panels
+    document.querySelectorAll('.sidebar-tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    document.getElementById(`sidebar-${tabName}`).classList.add('active');
+
+    lucide.createIcons();
+}
+
+// Show agent output in chat
+function showAgentInChat(agentName) {
+    const agentData = analysisData[agentName];
+    if (!agentData || !agentData.output) return;
+
+    const messagesContainer = document.getElementById('chatMessages');
+
+    // Remove welcome message if exists
+    const welcome = messagesContainer.querySelector('.chat-welcome');
+    if (welcome) welcome.remove();
+
+    // Add agent output as a message
+    const messageHtml = `
+        <div class="chat-message assistant">
+            <div class="message-avatar">
+                <i data-lucide="bot"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <strong>${agentName.charAt(0).toUpperCase() + agentName.slice(1)} Agent Output:</strong><br><br>
+                    ${formatOutput(agentData.output)}
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+    lucide.createIcons();
+
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Send chat message
+async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+
+    const messagesContainer = document.getElementById('chatMessages');
+
+    // Remove welcome message if exists
+    const welcome = messagesContainer.querySelector('.chat-welcome');
+    if (welcome) welcome.remove();
+
+    // Add user message
+    const userMessageHtml = `
+        <div class="chat-message user">
+            <div class="message-avatar">
+                <i data-lucide="user"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">${escapeHtml(message)}</div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.insertAdjacentHTML('beforeend', userMessageHtml);
+    lucide.createIcons();
+
+    // Add loading indicator
+    const loadingHtml = `
+        <div class="chat-message assistant loading-message">
+            <div class="message-avatar">
+                <i data-lucide="bot"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
+    lucide.createIcons();
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    try {
+        // Send to backend
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                company: currentCompany,
+                message: message,
+                context: {
+                    summary: analysisData.summary || '',
+                    researcher: analysisData.researcher?.output || '',
+                    financial: analysisData.financial?.output || '',
+                    strategic: analysisData.strategic?.output || '',
+                    writer: analysisData.writer?.output || ''
+                }
+            }),
+        });
+
+        const data = await response.json();
+
+        // Remove loading indicator
+        const loadingMessage = messagesContainer.querySelector('.loading-message');
+        if (loadingMessage) loadingMessage.remove();
+
+        // Add assistant response
+        const assistantMessageHtml = `
+            <div class="chat-message assistant">
+                <div class="message-avatar">
+                    <i data-lucide="bot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble">${formatOutput(data.response)}</div>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.insertAdjacentHTML('beforeend', assistantMessageHtml);
+        lucide.createIcons();
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    } catch (error) {
+        console.error('Chat error:', error);
+
+        // Remove loading indicator
+        const loadingMessage = messagesContainer.querySelector('.loading-message');
+        if (loadingMessage) loadingMessage.remove();
+
+        // Show error message
+        const errorMessageHtml = `
+            <div class="chat-message assistant">
+                <div class="message-avatar">
+                    <i data-lucide="alert-circle"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        Sorry, I encountered an error. Please try again.
+                    </div>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.insertAdjacentHTML('beforeend', errorMessageHtml);
+        lucide.createIcons();
+    }
+}
+
+// Start new analysis
+function startNewAnalysis() {
+    // Hide chat interface
+    document.getElementById('chatInterface').style.display = 'none';
+
+    // Show initial elements
+    document.querySelector('header').style.display = 'block';
+    document.getElementById('agentFlow').style.display = 'block';
+    document.getElementById('initialInputSection').style.display = 'block';
+
+    // Clear chat
+    document.getElementById('chatMessages').innerHTML = `
+        <div class="chat-welcome">
+            <i data-lucide="message-circle"></i>
+            <h3>Ask questions about <span id="chatCompanyName">the company</span></h3>
+            <p>Drill deep into specific aspects of the analysis</p>
+        </div>
+    `;
+
+    // Clear input
+    document.getElementById('companyInput').value = '';
+
+    // Reset state
+    currentCompany = '';
+    analysisData = {};
+    chatHistory = [];
+
+    lucide.createIcons();
+}

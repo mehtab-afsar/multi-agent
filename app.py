@@ -1,4 +1,10 @@
-# app.py - Flask Backend with WebSocket-like updates
+# app.py - LOCAL DEVELOPMENT VERSION ONLY
+#
+# This file is for LOCAL development with threading and real-time polling.
+# For VERCEL deployment, see app_vercel.py (used by api/index.py)
+#
+# To run locally: python app.py
+# Access at: http://localhost:5000
 
 import os
 from flask import Flask, render_template, request, jsonify
@@ -258,7 +264,7 @@ def run_analysis(company):
         # Save report
         filename = f"{company.lower().replace(' ', '_')}_report.txt"
         with open(filename, 'w', encoding='utf-8') as f:
-            f.write(f"MULTI-AGENT ANALYSIS: {company.upper()}\n")
+            f.write(f"Edge Alpha-Agent: {company.upper()}\n")
             f.write("="*70 + "\n\n")
             f.write("RESEARCH FINDINGS:\n")
             f.write(research_summary + "\n\n")

@@ -1,4 +1,13 @@
-# app_vercel.py - Vercel-compatible Flask Backend (without threading)
+# app_vercel.py - VERCEL PRODUCTION VERSION
+#
+# This file is used for VERCEL deployment (imported by api/index.py)
+# Differences from app.py:
+# - No threading (serverless compatible)
+# - Synchronous analysis (blocks until complete)
+# - Lazy client initialization (env vars from Vercel)
+# - Absolute paths for templates/static
+#
+# For local development with better UX, use app.py instead
 
 import os
 import sys
@@ -196,19 +205,11 @@ def index():
     # Use Vercel-specific script
     return render_template('index.html', use_vercel_script=True)
 
-@app.route('/test')
-def test():
-    # Diagnostic test page
-    return render_template('test.html')
-
 @app.route('/health')
 def health():
     """Health check endpoint"""
     return jsonify({
         'status': 'ok',
-        'python_version': sys.version,
-        'template_folder': app.template_folder,
-        'static_folder': app.static_folder,
         'groq_key_set': bool(os.environ.get('GROQ_API_KEY')),
         'tavily_key_set': bool(os.environ.get('TAVILY_API_KEY'))
     })
@@ -263,6 +264,71 @@ def analyze():
 def get_status():
     """Status endpoint (not used in Vercel version but kept for compatibility)"""
     return jsonify({'status': 'idle', 'message': 'Use /analyze endpoint directly'})
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    """Handle follow-up questions about analyzed company"""
+    try:
+        data = request.json
+        company = data.get('company', '')
+        message = data.get('message', '')
+        context = data.get('context', {})
+
+        if not company or not message:
+            return jsonify({'error': 'Missing company or message'}), 400
+
+        # Build context from previous analysis
+        context_text = f"""
+        COMPANY: {company}
+
+        EXECUTIVE SUMMARY:
+        {context.get('summary', 'N/A')}
+
+        RESEARCH FINDINGS:
+        {context.get('researcher', 'N/A')[:500]}
+
+        FINANCIAL ANALYSIS:
+        {context.get('financial', 'N/A')[:500]}
+
+        STRATEGIC INSIGHTS:
+        {context.get('strategic', 'N/A')[:500]}
+        """
+
+        # Call LLM for chat response
+        groq_client = get_groq_client()
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"""You are a business analyst assistant helping with follow-up questions about {company}.
+
+Use the analysis context below to answer questions accurately and concisely.
+
+{context_text}
+
+Format your responses with proper markdown:
+- Use ## for main sections
+- Use **bold** for emphasis
+- Use bullet points (- ) for lists
+- Keep responses clear and focused"""
+                },
+                {
+                    "role": "user",
+                    "content": message
+                }
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        answer = response.choices[0].message.content
+
+        return jsonify({'response': answer})
+
+    except Exception as e:
+        print(f"ERROR in /chat: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
