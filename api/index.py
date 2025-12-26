@@ -3,10 +3,17 @@ from flask_cors import CORS
 from groq import Groq
 from tavily import TavilyClient
 import os
+import sys
+
+# Get absolute paths for templates and static folders
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+template_dir = os.path.join(parent_dir, 'templates')
+static_dir = os.path.join(parent_dir, 'static')
 
 app = Flask(__name__,
-            template_folder='../templates',
-            static_folder='../static')
+            template_folder=template_dir,
+            static_folder=static_dir)
 CORS(app)
 
 # Initialize clients lazily (only when needed)
@@ -185,8 +192,12 @@ def health():
     """Health check endpoint"""
     return jsonify({
         'status': 'ok',
+        'python_version': sys.version,
+        'template_folder': app.template_folder,
+        'static_folder': app.static_folder,
         'groq_key_set': bool(os.environ.get('GROQ_API_KEY')),
-        'tavily_key_set': bool(os.environ.get('TAVILY_API_KEY'))
+        'tavily_key_set': bool(os.environ.get('TAVILY_API_KEY')),
+        'env_vars': list(os.environ.keys())[:10]  # First 10 env vars for debugging
     })
 
 @app.route('/analyze', methods=['POST'])
