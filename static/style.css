@@ -11,38 +11,79 @@ body {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
     color: #e0e0e0;
     min-height: 100vh;
-    padding: 2rem;
+    padding: 0;
     line-height: 1.6;
+    display: flex;
+}
+
+/* Universal Sidebar - Collapsible */
+.universal-sidebar {
+    width: 260px;
+    background: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.universal-sidebar.collapsed {
+    transform: translateX(-260px);
+}
+
+.sidebar-toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-collapse-btn {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-collapse-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sidebar-collapse-btn svg {
+    width: 18px;
+    height: 18px;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding-bottom: 120px; /* Space for fixed bottom input */
+    margin-left: 260px;
+    padding: 2rem;
+    padding-bottom: 120px;
+    flex: 1;
 }
 
-/* Header - Glassmorphism */
+/* Header - Minimal Modern */
 header {
     margin-bottom: 3rem;
-    padding: 2rem;
+    padding: 1.5rem 0;
     text-align: center;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 h1 {
-    font-size: 2.5rem;
-    font-weight: 200;
-    letter-spacing: -0.02em;
+    font-size: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #fff;
 }
 
 .subtitle {

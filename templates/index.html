@@ -11,11 +11,29 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Universal Sidebar (Collapsible) -->
+    <div class="universal-sidebar" id="universalSidebar">
+        <div class="sidebar-toggle-container">
+            <button class="sidebar-collapse-btn" onclick="toggleUniversalSidebar()">
+                <i data-lucide="panel-left-close" id="sidebarToggleIcon"></i>
+            </button>
+        </div>
+
+        <button class="new-chat-btn" onclick="startNewAnalysis()">
+            <i data-lucide="plus"></i>
+            <span>New Analysis</span>
+        </button>
+
+        <div class="chat-history-list" id="universalChatHistoryList">
+            <!-- Chat history items will be added here -->
+        </div>
+    </div>
+
     <div class="container">
-        <!-- Header -->
+        <!-- Header - Minimal Modern Design -->
         <header>
-            <h1>Edge Alpha Agent</h1>
-            <p class="subtitle">Intelligent Research • Real-Time Insights • Automated Reports</p>
+            <h1>Edge Alpha</h1>
+            <p class="subtitle">AI-powered company analysis</p>
         </header>
 
         <!-- Agent Flow Diagram -->
@@ -222,24 +240,7 @@
         <div class="analysis-content" id="analysisContent" style="display: none;">
             <h2 id="companyTitle">Company Analysis</h2>
 
-            <div class="status-badges">
-                <span class="badge" id="badge-researcher">
-                    <i data-lucide="search" class="badge-icon"></i>
-                    <span class="dot"></span> Researcher
-                </span>
-                <span class="badge" id="badge-financial">
-                    <i data-lucide="trending-up" class="badge-icon"></i>
-                    <span class="dot"></span> Financial
-                </span>
-                <span class="badge" id="badge-strategic">
-                    <i data-lucide="target" class="badge-icon"></i>
-                    <span class="dot"></span> Strategic
-                </span>
-                <span class="badge" id="badge-writer">
-                    <i data-lucide="file-text" class="badge-icon"></i>
-                    <span class="dot"></span> Writer
-                </span>
-            </div>
+            <!-- Status badges removed for cleaner design -->
 
             <!-- Main Tabs -->
             <div class="tabs">

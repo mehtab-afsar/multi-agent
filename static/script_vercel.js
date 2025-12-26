@@ -131,6 +131,9 @@ async function startAnalysis() {
         return;
     }
 
+    // Add company to sidebar immediately when search starts
+    addToChatHistory(company);
+
     // Disable input and icons during analysis
     const iconButtons = document.querySelectorAll('.icon-btn');
     companyInput.disabled = true;
@@ -692,9 +695,33 @@ function switchToChatInterface(company, data) {
     lucide.createIcons();
 }
 
-// Add company to chat history sidebar
+// Toggle universal sidebar
+function toggleUniversalSidebar() {
+    const sidebar = document.getElementById('universalSidebar');
+    const container = document.querySelector('.container');
+    const icon = document.getElementById('sidebarToggleIcon');
+
+    sidebar.classList.toggle('collapsed');
+
+    // Adjust container margin
+    if (sidebar.classList.contains('collapsed')) {
+        container.style.marginLeft = '0';
+        if (icon) icon.setAttribute('data-lucide', 'panel-left-open');
+    } else {
+        container.style.marginLeft = '260px';
+        if (icon) icon.setAttribute('data-lucide', 'panel-left-close');
+    }
+
+    lucide.createIcons();
+}
+
+// Add company to chat history sidebar (universal sidebar)
 function addToChatHistory(company) {
-    const historyList = document.getElementById('chatHistoryList');
+    // Try both the universal sidebar and the chatgpt layout sidebar
+    const universalList = document.getElementById('universalChatHistoryList');
+    const chatgptList = document.getElementById('chatHistoryList');
+
+    const historyList = universalList || chatgptList;
     if (!historyList) return;
 
     // Check if already exists
