@@ -5,15 +5,16 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from groq import Groq
 from tavily import TavilyClient
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-groq = Groq(api_key=os.getenv("GROQ_API_KEY"))
-tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+# Initialize clients lazily (only when needed)
+def get_groq_client():
+    return Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
+def get_tavily_client():
+    return TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
 # Agent configuration
 agent_config = {
@@ -58,6 +59,7 @@ STYLE_PROMPTS = {
 
 def call_llm(system_prompt, user_input):
     """Call Groq LLM"""
+    groq = get_groq_client()
     response = groq.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
@@ -72,6 +74,7 @@ def call_llm(system_prompt, user_input):
 def researcher_agent(company):
     """Searches web for latest news"""
     global agent_config
+    tavily = get_tavily_client()
 
     # Build search query with focus if provided
     search_query = f"{company} latest news 2024"
@@ -101,6 +104,7 @@ def researcher_agent(company):
 def financial_agent(company):
     """Gets financial data"""
     global agent_config
+    tavily = get_tavily_client()
 
     # Build search query with focus if provided
     search_query = f"{company} stock price market cap revenue 2024"
