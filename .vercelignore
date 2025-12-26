@@ -1,4 +1,12 @@
-*.txt
+# Ignore report files but NOT requirements.txt
+*_report.txt
+swiggy_report.txt
+zomato_report.txt
+google_report.txt
+desync_studio_report.txt
+amazon_report.txt
+
+# Ignore environment and system files
 .env
 .git
 .gitignore
@@ -6,3 +14,4 @@ multi_agent.py
 __pycache__
 *.pyc
 .DS_Store
+.claude
