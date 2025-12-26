@@ -248,11 +248,16 @@ def analyze():
         })
 
     except Exception as e:
-        return jsonify({
+        import traceback
+        error_details = {
             'status': 'error',
             'error': str(e),
-            'company': company
-        }), 500
+            'error_type': type(e).__name__,
+            'company': company,
+            'traceback': traceback.format_exc()
+        }
+        print(f"ERROR in /analyze: {error_details}")  # Log to Vercel console
+        return jsonify(error_details), 500
 
 @app.route('/status')
 def get_status():
