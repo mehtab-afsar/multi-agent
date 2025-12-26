@@ -242,7 +242,18 @@
 
         <!-- Analysis Content -->
         <div class="analysis-content" id="analysisContent" style="display: none;">
-            <h2 id="companyTitle">Company Analysis</h2>
+            <!-- Compact Header (also shown before chat mode) -->
+            <div class="compact-header-card" id="compactHeaderInitial" style="display: none;">
+                <div class="compact-header-content">
+                    <div class="compact-logo">Edge Alpha</div>
+                    <div class="compact-divider">•</div>
+                    <div class="compact-subtitle">AI-powered research analysis</div>
+                    <div class="compact-divider">•</div>
+                    <div class="compact-company" id="compactCompanyNameInitial"></div>
+                </div>
+            </div>
+
+            <h2 id="companyTitle" style="display: none;">Company Analysis</h2>
 
             <!-- Status badges removed for cleaner design -->
 
@@ -363,6 +374,17 @@
 
             <!-- Main Content Area -->
             <div class="main-content-area">
+                <!-- Compact Header Card (shown in chat mode) -->
+                <div class="compact-header-card" id="compactHeaderCard" style="display: none;">
+                    <div class="compact-header-content">
+                        <div class="compact-logo">Edge Alpha</div>
+                        <div class="compact-divider">•</div>
+                        <div class="compact-subtitle">AI-powered research analysis</div>
+                        <div class="compact-divider">•</div>
+                        <div class="compact-company" id="compactCompanyName"></div>
+                    </div>
+                </div>
+
                 <!-- Analysis Results (Summary + Agents Tabs) -->
                 <div class="analysis-results-section" id="analysisResultsSection">
                     <!-- This will contain the summary and agents tabs -->
@@ -378,6 +400,9 @@
                     <!-- Chat Input (Fixed at Bottom) -->
                     <div class="chat-input-fixed">
                         <div class="chat-input-container">
+                            <button class="settings-btn-chat" onclick="toggleConfig()" title="Settings">
+                                <i data-lucide="settings"></i>
+                            </button>
                             <textarea
                                 id="chatInputNew"
                                 placeholder="Ask a follow-up question about the analysis..."

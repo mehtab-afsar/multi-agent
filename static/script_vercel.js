@@ -66,16 +66,31 @@ function applyConfig() {
 
 // Toggle agent config section
 function toggleAgentConfig(agent) {
-    const section = document.getElementById(`${agent}-config`);
-    const icon = section.previousElementSibling.querySelector('i[data-lucide="chevron-down"]');
-
-    section.classList.toggle('active');
-
-    if (section.classList.contains('active')) {
-        icon.style.transform = 'rotate(180deg)';
-    } else {
-        icon.style.transform = 'rotate(0deg)';
+    const section = document.getElementById(`config-${agent}`);
+    if (!section) {
+        console.error(`Config section not found for agent: ${agent}`);
+        return;
     }
+
+    const parent = section.parentElement;
+    const chevronIcon = parent.querySelector('.chevron-icon');
+
+    // Toggle display
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        if (chevronIcon) {
+            chevronIcon.style.transform = 'rotate(180deg)';
+        }
+        parent.classList.add('expanded');
+    } else {
+        section.style.display = 'none';
+        if (chevronIcon) {
+            chevronIcon.style.transform = 'rotate(0deg)';
+        }
+        parent.classList.remove('expanded');
+    }
+
+    lucide.createIcons();
 }
 
 // Switch main tabs
@@ -160,7 +175,21 @@ async function startAnalysis() {
 
     // Show analysis content
     document.getElementById('analysisContent').style.display = 'block';
-    document.getElementById('companyTitle').textContent = `${company} Analysis`;
+
+    // Hide the large h2 title and show compact header instead
+    const companyTitle = document.getElementById('companyTitle');
+    if (companyTitle) {
+        companyTitle.textContent = `${company} Analysis`;
+        companyTitle.style.display = 'none';  // Hide it from the start
+    }
+
+    // Show initial compact header immediately
+    const compactHeaderInitial = document.getElementById('compactHeaderInitial');
+    const compactCompanyNameInitial = document.getElementById('compactCompanyNameInitial');
+    if (compactHeaderInitial && compactCompanyNameInitial) {
+        compactHeaderInitial.style.display = 'block';
+        compactCompanyNameInitial.textContent = `${company} Analysis`;
+    }
 
     // Reset outputs
     resetOutputs();
@@ -696,6 +725,20 @@ function switchToChatInterface(company, data) {
         // Show the ChatGPT layout
         chatgptLayout.style.display = 'flex';
 
+        // Show compact header and set company name
+        const compactHeader = document.getElementById('compactHeaderCard');
+        const compactCompanyName = document.getElementById('compactCompanyName');
+        if (compactHeader && compactCompanyName) {
+            compactHeader.style.display = 'block';
+            compactCompanyName.textContent = `${company} Analysis`;
+        }
+
+        // Hide the large company title h2
+        const companyTitle = document.getElementById('companyTitle');
+        if (companyTitle) {
+            companyTitle.style.display = 'none';
+        }
+
         // Move (not clone) the original analysis content
         analysisContent.style.display = 'block';
         analysisResultsSection.innerHTML = '';
@@ -739,12 +782,20 @@ function toggleUniversalSidebar() {
 
 // Add company to chat history sidebar (universal sidebar)
 function addToChatHistory(company) {
+    console.log('addToChatHistory called with:', company);
+
     // Try both the universal sidebar and the chatgpt layout sidebar
     const universalList = document.getElementById('universalChatHistoryList');
     const chatgptList = document.getElementById('chatHistoryList');
 
+    console.log('universalList:', universalList);
+    console.log('chatgptList:', chatgptList);
+
     const historyList = universalList || chatgptList;
-    if (!historyList) return;
+    if (!historyList) {
+        console.error('No history list found!');
+        return;
+    }
 
     // Check if already exists
     const existing = Array.from(historyList.children).find(
@@ -900,6 +951,10 @@ async function sendChatMessage() {
 
         const data = await response.json();
 
+        // Add a minimum delay of 1-2 seconds for more natural feel (like ChatGPT)
+        const minDelay = 1000 + Math.random() * 1000; // Random between 1-2 seconds
+        await new Promise(resolve => setTimeout(resolve, minDelay));
+
         // Remove loading indicator
         const loadingMessage = messagesContainer.querySelector('.loading-message');
         if (loadingMessage) loadingMessage.remove();
@@ -990,3 +1045,87 @@ function startNewAnalysis() {
 
     lucide.createIcons();
 }
+
+// Typing effect for placeholder
+let typingInterval = null;
+let currentPhraseIndex = 0;
+let currentCharIndex = 0;
+let isDeleting = false;
+let isPaused = false;
+
+const placeholderPhrases = [
+    "Enter company name (e.g., NVIDIA, Tesla, Microsoft)",
+    "Tell me about Alphabet's quarterly earnings",
+    "Analyze Tesla's financial performance",
+    "What's Microsoft's recent strategy?",
+    "How is NVIDIA positioned in AI market?",
+    "Compare Apple's revenue trends"
+];
+
+function typeEffect() {
+    const input = document.getElementById('companyInput');
+    if (!input || document.activeElement === input) {
+        // Don't change placeholder while user is typing
+        return;
+    }
+
+    const currentPhrase = placeholderPhrases[currentPhraseIndex];
+
+    if (isPaused) {
+        // Stay paused for 3 seconds after completing a phrase
+        return;
+    }
+
+    if (!isDeleting && currentCharIndex <= currentPhrase.length) {
+        // Typing
+        input.placeholder = currentPhrase.substring(0, currentCharIndex);
+        currentCharIndex++;
+
+        if (currentCharIndex > currentPhrase.length) {
+            // Finished typing, pause for 3 seconds
+            isPaused = true;
+            setTimeout(() => {
+                isPaused = false;
+                isDeleting = true;
+            }, 3000);
+        }
+    } else if (isDeleting && currentCharIndex >= 0) {
+        // Deleting
+        input.placeholder = currentPhrase.substring(0, currentCharIndex);
+        currentCharIndex--;
+
+        if (currentCharIndex < 0) {
+            // Finished deleting, move to next phrase
+            isDeleting = false;
+            currentPhraseIndex = (currentPhraseIndex + 1) % placeholderPhrases.length;
+            currentCharIndex = 0;
+        }
+    }
+}
+
+// Start typing effect on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Start typing effect
+    typingInterval = setInterval(typeEffect, isDeleting ? 30 : 80);
+
+    // Pause typing when user focuses on input
+    const input = document.getElementById('companyInput');
+    if (input) {
+        input.addEventListener('focus', () => {
+            if (typingInterval) {
+                clearInterval(typingInterval);
+            }
+            input.placeholder = "Enter company name...";
+        });
+
+        input.addEventListener('blur', () => {
+            // Resume typing effect when input loses focus
+            if (!input.value) {
+                currentCharIndex = 0;
+                isDeleting = false;
+                isPaused = false;
+                typingInterval = setInterval(typeEffect, isDeleting ? 30 : 80);
+            }
+        });
+    }
+});
