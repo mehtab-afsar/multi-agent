@@ -203,7 +203,16 @@ def writer_agent(company, research, financials, insights):
 @app.route('/')
 def index():
     # Use Vercel-specific script
-    return render_template('index.html', use_vercel_script=True)
+    print("Index route accessed")
+    try:
+        result = render_template('index.html', use_vercel_script=True)
+        print("Template rendered successfully")
+        return result
+    except Exception as e:
+        print(f"Error rendering template: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return str(e), 500
 
 @app.route('/health')
 def health():
@@ -297,7 +306,7 @@ def chat():
         # Call LLM for chat response
         groq_client = get_groq_client()
         response = groq_client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
@@ -334,4 +343,4 @@ Format your responses with proper markdown:
         return jsonify({'error': str(e), 'details': error_details}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=3000)

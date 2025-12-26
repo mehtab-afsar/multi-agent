@@ -342,46 +342,43 @@
             </div>
         </div>
 
-        <!-- Chat Interface (Hidden initially, shown after analysis) -->
-        <div class="chat-interface" id="chatInterface" style="display: none;">
-            <div class="chat-container">
-                <!-- Sidebar for conversation history -->
-                <div class="chat-sidebar-new" id="chatSidebar">
-                    <div class="sidebar-header-new">
-                        <h4>Conversation</h4>
-                        <button class="sidebar-toggle-btn-new" onclick="toggleSidebar()">
-                            <i data-lucide="panel-left-close"></i>
-                        </button>
-                    </div>
-                    <div class="conversation-history" id="conversationHistory">
-                        <p class="placeholder-small">Ask questions to start a conversation</p>
-                    </div>
-                    <button class="new-analysis-btn" onclick="startNewAnalysis()">
-                        <i data-lucide="plus-circle"></i> New Analysis
-                    </button>
+        <!-- ChatGPT-style Layout (Hidden initially, shown after analysis) -->
+        <div class="chatgpt-layout" id="chatgptLayout" style="display: none;">
+            <!-- Sidebar with Chat History -->
+            <div class="chat-history-sidebar" id="chatHistorySidebar">
+                <button class="new-chat-btn" onclick="startNewAnalysis()">
+                    <i data-lucide="plus"></i>
+                    <span>New Analysis</span>
+                </button>
+
+                <div class="chat-history-list" id="chatHistoryList">
+                    <!-- Chat history items will be added here -->
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content-area">
+                <!-- Analysis Results (Summary + Agents Tabs) -->
+                <div class="analysis-results-section" id="analysisResultsSection">
+                    <!-- This will contain the summary and agents tabs -->
                 </div>
 
-                <!-- Main Chat Section -->
-                <div class="chat-section">
-                    <div class="chat-header">
-                        <h3>Ask questions about <span id="chatCompanyName">the company</span></h3>
-                        <p>Drill deep into specific aspects of the analysis</p>
-                    </div>
-
+                <!-- Chat Section Below -->
+                <div class="chat-section-below">
                     <!-- Chat Messages -->
-                    <div class="chat-messages-new" id="chatMessages">
+                    <div class="chat-messages-area" id="chatMessagesArea">
                         <!-- Messages will appear here -->
                     </div>
 
-                    <!-- Chat Input -->
-                    <div class="chat-input-section-new">
-                        <div class="chat-input-wrapper-new">
+                    <!-- Chat Input (Fixed at Bottom) -->
+                    <div class="chat-input-fixed">
+                        <div class="chat-input-container">
                             <textarea
-                                id="chatInput"
-                                placeholder="Ask a follow-up question..."
+                                id="chatInputNew"
+                                placeholder="Ask a follow-up question about the analysis..."
                                 rows="1"
                             ></textarea>
-                            <button class="chat-send-btn-new" onclick="sendChatMessage()" title="Send (Enter)">
+                            <button class="send-btn" onclick="sendChatMessage()" title="Send (Enter)">
                                 <i data-lucide="send"></i>
                             </button>
                         </div>

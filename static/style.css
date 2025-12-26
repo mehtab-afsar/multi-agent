@@ -1492,19 +1492,200 @@ button:disabled {
     }
 }
 
-/* Chat Interface - New Layout */
-.chat-interface {
-    display: block;
-    margin-top: 2rem;
-    margin-bottom: 3rem;
+/* ChatGPT-style Layout */
+.chatgpt-layout {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    z-index: 1000;
 }
 
-.chat-container {
+/* Chat History Sidebar (like ChatGPT) */
+.chat-history-sidebar {
+    width: 260px;
+    background: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
-    gap: 1.5rem;
-    max-width: 1200px;
+    flex-direction: column;
+    padding: 0.75rem;
+}
+
+.new-chat-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.new-chat-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.new-chat-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.chat-history-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-history-item {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #ccc;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chat-history-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.chat-history-item.active {
+    background: rgba(100, 200, 255, 0.15);
+    border-color: rgba(100, 200, 255, 0.3);
+    color: #64c8ff;
+}
+
+.chat-history-item svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* Main Content Area */
+.main-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Analysis Results Section (Summary + Agents Tabs) */
+.analysis-results-section {
+    flex-shrink: 0;
+    max-height: none;
+    overflow-y: visible;
+    padding: 1.5rem;
+}
+
+/* Chat Section Below */
+.chat-section-below {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 100px;
+}
+
+.chat-messages-area {
+    padding: 2rem 1.5rem;
+    max-width: 900px;
     margin: 0 auto;
-    min-height: 600px;
+    width: 100%;
+}
+
+.chat-input-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 260px;
+    right: 0;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.chat-input-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+#chatInputNew {
+    flex: 1;
+    padding: 0.9rem 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    resize: none;
+    max-height: 120px;
+    min-height: 44px;
+    transition: all 0.3s ease;
+}
+
+#chatInputNew:focus {
+    outline: none;
+    border-color: rgba(100, 200, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#chatInputNew::placeholder {
+    color: #666;
+}
+
+.send-btn {
+    padding: 0.9rem;
+    background: rgba(100, 200, 255, 0.2);
+    border: 1px solid rgba(100, 200, 255, 0.3);
+    border-radius: 10px;
+    color: #64c8ff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.send-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.send-btn:hover {
+    background: rgba(100, 200, 255, 0.3);
+    border-color: rgba(100, 200, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.send-btn:active {
+    transform: translateY(0);
 }
 
 /* Sidebar for Conversation History */
