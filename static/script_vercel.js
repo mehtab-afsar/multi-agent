@@ -1,4 +1,4 @@
-// script_vercel.js - Frontend for Vercel (synchronous)
+// script_vercel.js - Frontend for Vercel (synchronous) - Updated v6
 
 let agentConfig = {
     researcher: { style: 'bullets', focus: '' },
@@ -156,15 +156,24 @@ async function startAnalysis() {
         return;
     }
 
-    // Add company to sidebar immediately when search starts
-    addToChatHistory(company);
-
     // Disable input and icons during analysis
     const iconButtons = document.querySelectorAll('.icon-btn');
     companyInput.disabled = true;
     iconButtons.forEach(btn => btn.disabled = true);
 
-    // Hide the agent flow diagram
+    // Hide the hero section, agents section title, flow diagram, and trusted section
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+        setTimeout(() => {
+            heroSection.style.display = 'none';
+        }, 500);
+    }
+
+    const agentsSectionTitle = document.getElementById('agentsSectionTitle');
+    if (agentsSectionTitle) {
+        agentsSectionTitle.classList.add('hide');
+    }
+
     const agentFlow = document.getElementById('agentFlow');
     if (agentFlow) {
         agentFlow.classList.add('hide');
@@ -173,23 +182,45 @@ async function startAnalysis() {
         }, 500);
     }
 
-    // Show analysis content
-    document.getElementById('analysisContent').style.display = 'block';
+    const trustedSection = document.getElementById('trustedSection');
+    if (trustedSection) {
+        trustedSection.classList.add('hide');
+    }
 
-    // Hide the large h2 title and show compact header instead
+    // Show ChatGPT layout directly from the start
+    const chatgptLayout = document.getElementById('chatgptLayout');
+    if (chatgptLayout) {
+        chatgptLayout.style.display = 'flex';
+    }
+
+    // Add company to sidebar AFTER showing the layout
+    addToChatHistory(company);
+
+    // Show compact header in chat layout immediately
+    const compactHeaderCard = document.getElementById('compactHeaderCard');
+    const compactCompanyName = document.getElementById('compactCompanyName');
+    if (compactHeaderCard && compactCompanyName) {
+        compactHeaderCard.style.display = 'block';
+        compactCompanyName.textContent = `${company} Analysis`;
+    }
+
+    // Move analysis content to chat layout immediately (before loading starts)
+    const analysisContent = document.getElementById('analysisContent');
+    const analysisResultsSection = document.getElementById('analysisResultsSection');
+    if (analysisContent && analysisResultsSection) {
+        analysisContent.style.display = 'block';
+        analysisResultsSection.appendChild(analysisContent);
+    }
+
+    // Hide the large h2 title
     const companyTitle = document.getElementById('companyTitle');
     if (companyTitle) {
         companyTitle.textContent = `${company} Analysis`;
-        companyTitle.style.display = 'none';  // Hide it from the start
+        companyTitle.style.display = 'none';
     }
 
-    // Show initial compact header immediately
-    const compactHeaderInitial = document.getElementById('compactHeaderInitial');
-    const compactCompanyNameInitial = document.getElementById('compactCompanyNameInitial');
-    if (compactHeaderInitial && compactCompanyNameInitial) {
-        compactHeaderInitial.style.display = 'block';
-        compactCompanyNameInitial.textContent = `${company} Analysis`;
-    }
+    // Store company for later use
+    currentCompany = company;
 
     // Reset outputs
     resetOutputs();
@@ -379,18 +410,16 @@ function updateUI(data) {
     // Reinitialize icons
     lucide.createIcons();
 
-    // After 1 second, switch to chat interface
-    console.log('Setting timeout to switch to chat interface...');
-    setTimeout(() => {
-        const companyTitle = document.getElementById('companyTitle');
-        if (companyTitle) {
-            const company = companyTitle.textContent.replace(' Analysis', '');
-            console.log('Timeout executed, switching to chat for:', company);
-            switchToChatInterface(company, data);
-        } else {
-            console.error('Company title element not found');
-        }
-    }, 1000);
+    // Switch to chat interface immediately (no delay)
+    console.log('Switching to chat interface...');
+    const companyTitle = document.getElementById('companyTitle');
+    if (companyTitle) {
+        const company = companyTitle.textContent.replace(' Analysis', '');
+        console.log('Switching to chat for:', company);
+        switchToChatInterface(company, data);
+    } else {
+        console.error('Company title element not found');
+    }
 }
 
 // Update progress bar
@@ -670,12 +699,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loadConfig();
     lucide.createIcons();
 
+    // Old bottom input is removed, so skip this
     const input = document.getElementById('companyInput');
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !input.disabled) {
-            startAnalysis();
-        }
-    });
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !input.disabled) {
+                startAnalysis();
+            }
+        });
+    }
 
     // Chat input enter key - attach to both inputs
     const setupChatInput = (inputId) => {
@@ -1018,15 +1050,27 @@ function startNewAnalysis() {
     const analysisContent = document.getElementById('analysisContent');
     if (analysisContent) analysisContent.style.display = 'none';
 
-    // Show initial elements
-    const header = document.querySelector('header');
-    if (header) header.style.display = 'block';
+    // Show initial elements - hero section, agents section, flow diagram, trusted section
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) heroSection.style.display = 'block';
+
+    const agentsSectionTitle = document.getElementById('agentsSectionTitle');
+    if (agentsSectionTitle) {
+        agentsSectionTitle.classList.remove('hide');
+        agentsSectionTitle.style.display = 'block';
+    }
 
     const agentFlow = document.getElementById('agentFlow');
-    if (agentFlow) agentFlow.style.display = 'block';
+    if (agentFlow) {
+        agentFlow.classList.remove('hide');
+        agentFlow.style.display = 'block';
+    }
 
-    const initialInputSection = document.getElementById('initialInputSection');
-    if (initialInputSection) initialInputSection.style.display = 'block';
+    const trustedSection = document.getElementById('trustedSection');
+    if (trustedSection) {
+        trustedSection.classList.remove('hide');
+        trustedSection.style.display = 'block';
+    }
 
     // Clear chat messages
     const chatMessages = document.getElementById('chatMessagesArea');
@@ -1034,9 +1078,12 @@ function startNewAnalysis() {
         chatMessages.innerHTML = '';
     }
 
-    // Clear input
-    const companyInput = document.getElementById('companyInput');
-    if (companyInput) companyInput.value = '';
+    // Clear hero input
+    const heroInput = document.getElementById('companyInputHero');
+    if (heroInput) {
+        heroInput.value = '';
+        heroInput.disabled = false;
+    }
 
     // Reset state
     currentCompany = '';
@@ -1063,8 +1110,8 @@ const placeholderPhrases = [
 ];
 
 function typeEffect() {
-    const input = document.getElementById('companyInput');
-    if (!input || document.activeElement === input) {
+    const heroInput = document.getElementById('companyInputHero');
+    if (!heroInput || document.activeElement === heroInput) {
         // Don't change placeholder while user is typing
         return;
     }
@@ -1078,7 +1125,7 @@ function typeEffect() {
 
     if (!isDeleting && currentCharIndex <= currentPhrase.length) {
         // Typing
-        input.placeholder = currentPhrase.substring(0, currentCharIndex);
+        heroInput.placeholder = currentPhrase.substring(0, currentCharIndex);
         currentCharIndex++;
 
         if (currentCharIndex > currentPhrase.length) {
@@ -1091,7 +1138,7 @@ function typeEffect() {
         }
     } else if (isDeleting && currentCharIndex >= 0) {
         // Deleting
-        input.placeholder = currentPhrase.substring(0, currentCharIndex);
+        heroInput.placeholder = currentPhrase.substring(0, currentCharIndex);
         currentCharIndex--;
 
         if (currentCharIndex < 0) {
@@ -1108,24 +1155,152 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start typing effect
     typingInterval = setInterval(typeEffect, isDeleting ? 30 : 80);
 
-    // Pause typing when user focuses on input
-    const input = document.getElementById('companyInput');
-    if (input) {
-        input.addEventListener('focus', () => {
+    // Pause typing when user focuses on hero input
+    const heroInput = document.getElementById('companyInputHero');
+    if (heroInput) {
+        heroInput.addEventListener('focus', () => {
             if (typingInterval) {
                 clearInterval(typingInterval);
             }
-            input.placeholder = "Enter company name...";
+            heroInput.placeholder = "Enter company name...";
         });
 
-        input.addEventListener('blur', () => {
+        heroInput.addEventListener('blur', () => {
             // Resume typing effect when input loses focus
-            if (!input.value) {
+            if (!heroInput.value) {
                 currentCharIndex = 0;
                 isDeleting = false;
                 isPaused = false;
                 typingInterval = setInterval(typeEffect, isDeleting ? 30 : 80);
             }
         });
+
+        // Add Enter key support for hero search input
+        heroInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startAnalysisFromHero();
+            }
+        });
     }
 });
+
+// Start analysis from hero search bar
+async function startAnalysisFromHero() {
+    const heroInput = document.getElementById('companyInputHero');
+    const company = heroInput.value.trim();
+
+    if (!company) {
+        alert('Please enter a company name');
+        return;
+    }
+
+    // Disable hero input and icon buttons during analysis
+    const iconButtons = document.querySelectorAll('.hero-input-icons .icon-btn');
+    heroInput.disabled = true;
+    iconButtons.forEach(btn => btn.disabled = true);
+
+    // Hide the hero section, agents section title, flow diagram, and trusted section
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+        setTimeout(() => {
+            heroSection.style.display = 'none';
+        }, 500);
+    }
+
+    const agentsSectionTitle = document.getElementById('agentsSectionTitle');
+    if (agentsSectionTitle) {
+        agentsSectionTitle.classList.add('hide');
+    }
+
+    const agentFlow = document.getElementById('agentFlow');
+    if (agentFlow) {
+        agentFlow.classList.add('hide');
+        setTimeout(() => {
+            agentFlow.style.display = 'none';
+        }, 500);
+    }
+
+    const trustedSection = document.getElementById('trustedSection');
+    if (trustedSection) {
+        trustedSection.classList.add('hide');
+    }
+
+    // Show ChatGPT layout directly from the start
+    const chatgptLayout = document.getElementById('chatgptLayout');
+    if (chatgptLayout) {
+        chatgptLayout.style.display = 'flex';
+    }
+
+    // Add company to sidebar AFTER showing the layout
+    addToChatHistory(company);
+
+    // Show compact header in chat layout immediately
+    const compactHeaderCard = document.getElementById('compactHeaderCard');
+    const compactCompanyName = document.getElementById('compactCompanyName');
+    if (compactHeaderCard && compactCompanyName) {
+        compactHeaderCard.style.display = 'block';
+        compactCompanyName.textContent = `${company} Analysis`;
+    }
+
+    // Move analysis content to chat layout immediately (before loading starts)
+    const analysisContent = document.getElementById('analysisContent');
+    const analysisResultsSection = document.getElementById('analysisResultsSection');
+    if (analysisContent && analysisResultsSection) {
+        analysisContent.style.display = 'block';
+        analysisResultsSection.appendChild(analysisContent);
+    }
+
+    // Hide the large h2 title
+    const companyTitle = document.getElementById('companyTitle');
+    if (companyTitle) {
+        companyTitle.textContent = `${company} Analysis`;
+        companyTitle.style.display = 'none';
+    }
+
+    // Store company for later use
+    currentCompany = company;
+
+    // Reset outputs
+    resetOutputs();
+
+    // Show loading state
+    showLoadingState();
+
+    try {
+        // Make synchronous API call (will wait for complete response)
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                company,
+                config: agentConfig
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Clear the simulated progress interval
+        if (window.progressSimulationInterval) {
+            clearInterval(window.progressSimulationInterval);
+        }
+
+        // Update UI with complete results
+        updateProgress(100);
+        updateUI(data);
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to complete analysis. Please try again.');
+
+        // Re-enable hero input on error
+        heroInput.disabled = false;
+        iconButtons.forEach(btn => btn.disabled = false);
+    }
+}

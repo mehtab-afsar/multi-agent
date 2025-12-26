@@ -35,13 +35,42 @@
     </button>
 
     <div class="container">
-        <!-- Header - Minimal Modern Design -->
-        <header>
-            <h1>Edge Alpha</h1>
-            <p class="subtitle">AI-powered research analysis</p>
-        </header>
+        <!-- Hero Section - Modern Landing -->
+        <div class="hero-section" id="heroSection">
+            <h1 class="hero-title">
+                Turn <span class="highlight">One Question</span><br>
+                Into Complete Market Intelligence
+            </h1>
+            <p class="hero-subtitle">
+                Enterprise-grade research analysis powered by AI agents working in parallel
+            </p>
 
-        <!-- Agent Flow Diagram -->
+            <!-- Search Bar in Hero (Same as Bottom) -->
+            <div class="hero-input-wrapper">
+                <input
+                    type="text"
+                    id="companyInputHero"
+                    placeholder="Enter a company (e.g. Apple, Tesla, Microsoft)"
+                    autocomplete="off"
+                >
+                <div class="hero-input-icons">
+                    <button class="icon-btn" onclick="toggleConfig()" title="Settings">
+                        <i data-lucide="settings"></i>
+                    </button>
+                    <button class="icon-btn" onclick="startAnalysisFromHero()" title="Generate Intelligence (Enter)">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Agents Section Title -->
+        <div class="agents-section-title" id="agentsSectionTitle">
+            <h3>AI Research Agents Working For You</h3>
+            <p>Parallel processing delivers comprehensive insights in seconds</p>
+        </div>
+
+        <!-- Agent Flow Diagram - Original Flow Style -->
         <div class="agent-flow" id="agentFlow">
             <div class="flow-container">
                 <!-- User Input Node -->
@@ -77,18 +106,14 @@
                 <div class="flow-parallel-h">
                     <div class="parallel-branch-h">
                         <div class="flow-node agent-node">
-                            
                             <i data-lucide="trending-up"></i>
                             <span>Financial</span>
-                            
                         </div>
                     </div>
                     <div class="parallel-branch-h">
                         <div class="flow-node agent-node">
-                            
                             <i data-lucide="target"></i>
                             <span>Strategic</span>
-                            
                         </div>
                     </div>
                 </div>
@@ -105,10 +130,8 @@
 
                 <!-- Writer Agent -->
                 <div class="flow-node agent-node">
-                    
                     <i data-lucide="file-text"></i>
                     <span>Writer</span>
-                    
                 </div>
 
                 <!-- Connection Line -->
@@ -120,11 +143,22 @@
 
                 <!-- Output Node -->
                 <div class="flow-node end-node">
-                    
                     <i data-lucide="file-check"></i>
                     <span>Final Report</span>
-                    
                 </div>
+            </div>
+        </div>
+
+        <!-- Trusted Companies Section -->
+        <div class="trusted-section" id="trustedSection">
+            <p class="trusted-label">Trusted Research on Top Companies</p>
+            <div class="companies-logos">
+                <span class="company-name">NVIDIA</span>
+                <span class="company-name">Tesla</span>
+                <span class="company-name">Microsoft</span>
+                <span class="company-name">Apple</span>
+                <span class="company-name">Alphabet</span>
+                <span class="company-name">Meta</span>
             </div>
         </div>
 
@@ -242,17 +276,6 @@
 
         <!-- Analysis Content -->
         <div class="analysis-content" id="analysisContent" style="display: none;">
-            <!-- Compact Header (also shown before chat mode) -->
-            <div class="compact-header-card" id="compactHeaderInitial" style="display: none;">
-                <div class="compact-header-content">
-                    <div class="compact-logo">Edge Alpha</div>
-                    <div class="compact-divider">•</div>
-                    <div class="compact-subtitle">AI-powered research analysis</div>
-                    <div class="compact-divider">•</div>
-                    <div class="compact-company" id="compactCompanyNameInitial"></div>
-                </div>
-            </div>
-
             <h2 id="companyTitle" style="display: none;">Company Analysis</h2>
 
             <!-- Status badges removed for cleaner design -->
@@ -417,25 +440,6 @@
             </div>
         </div>
 
-        <!-- Input Section (Bottom) -->
-        <div class="input-section-bottom" id="initialInputSection">
-            <div class="input-wrapper">
-                <input
-                    type="text"
-                    id="companyInput"
-                    placeholder="Enter company name (e.g., NVIDIA, Tesla, Microsoft)"
-                    autocomplete="off"
-                >
-                <div class="input-icons">
-                    <button class="icon-btn" onclick="toggleConfig()" title="Settings">
-                        <i data-lucide="settings"></i>
-                    </button>
-                    <button class="icon-btn" onclick="startAnalysis()" title="Start Analysis (Enter)">
-                        <i data-lucide="arrow-up"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     {% if use_vercel_script %}
