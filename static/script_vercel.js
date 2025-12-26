@@ -36,7 +36,17 @@ function updateConfigUI() {
 // Toggle configuration panel
 function toggleConfig() {
     const panel = document.getElementById('configPanel');
-    panel.classList.toggle('active');
+    const backdrop = document.getElementById('configBackdrop');
+
+    if (panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'block';
+        if (backdrop) backdrop.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+        if (backdrop) backdrop.style.display = 'none';
+    }
+
+    lucide.createIcons();
 }
 
 // Apply configuration
@@ -282,13 +292,20 @@ function resetOutputs() {
     const agents = ['researcher', 'financial', 'strategic', 'writer'];
     agents.forEach(agent => {
         const badge = document.getElementById(`badge-${agent}`);
-        badge.className = 'badge pending';
+        if (badge) {
+            badge.className = 'badge pending';
+        }
 
         const output = document.getElementById(`${agent}-output`);
-        output.innerHTML = '<p class="placeholder">Waiting to start...</p>';
+        if (output) {
+            output.innerHTML = '<p class="placeholder">Waiting to start...</p>';
+        }
     });
 
-    document.getElementById('summaryContent').innerHTML = '<p class="placeholder">Analysis in progress...</p>';
+    const summaryContent = document.getElementById('summaryContent');
+    if (summaryContent) {
+        summaryContent.innerHTML = '<p class="placeholder">Analysis in progress...</p>';
+    }
 
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
@@ -310,9 +327,11 @@ function updateUI(data) {
     agents.forEach(agent => {
         const agentData = data[agent];
         if (agentData) {
-            // Update badge
+            // Update badge (if it exists)
             const badge = document.getElementById(`badge-${agent}`);
-            badge.className = `badge ${agentData.status}`;
+            if (badge) {
+                badge.className = `badge ${agentData.status}`;
+            }
 
             // Update output
             const output = document.getElementById(`${agent}-output`);
@@ -700,16 +719,19 @@ function toggleUniversalSidebar() {
     const sidebar = document.getElementById('universalSidebar');
     const container = document.querySelector('.container');
     const icon = document.getElementById('sidebarToggleIcon');
+    const reopenBtn = document.getElementById('sidebarReopenBtn');
 
     sidebar.classList.toggle('collapsed');
 
-    // Adjust container margin
+    // Adjust container margin and show/hide reopen button
     if (sidebar.classList.contains('collapsed')) {
         container.style.marginLeft = '0';
         if (icon) icon.setAttribute('data-lucide', 'panel-left-open');
+        if (reopenBtn) reopenBtn.style.display = 'block';
     } else {
         container.style.marginLeft = '260px';
         if (icon) icon.setAttribute('data-lucide', 'panel-left-close');
+        if (reopenBtn) reopenBtn.style.display = 'none';
     }
 
     lucide.createIcons();

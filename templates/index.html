@@ -29,11 +29,16 @@
         </div>
     </div>
 
+    <!-- Floating button to reopen sidebar when collapsed -->
+    <button class="sidebar-reopen-btn" id="sidebarReopenBtn" onclick="toggleUniversalSidebar()" style="display: none;">
+        <i data-lucide="panel-left-open"></i>
+    </button>
+
     <div class="container">
         <!-- Header - Minimal Modern Design -->
         <header>
             <h1>Edge Alpha</h1>
-            <p class="subtitle">AI-powered company analysis</p>
+            <p class="subtitle">AI-powered research analysis</p>
         </header>
 
         <!-- Agent Flow Diagram -->
@@ -41,10 +46,8 @@
             <div class="flow-container">
                 <!-- User Input Node -->
                 <div class="flow-node start-node">
-                    <div class="node-glow"></div>
                     <i data-lucide="user"></i>
-                    <span>User Query</span>
-                    <p class="node-desc">Company Request</p>
+                    <span>Query</span>
                 </div>
 
                 <!-- Connection Line -->
@@ -56,10 +59,8 @@
 
                 <!-- Researcher Agent -->
                 <div class="flow-node agent-node">
-                    <div class="node-glow"></div>
                     <i data-lucide="search"></i>
                     <span>Research</span>
-                    <p class="node-desc">News & Data</p>
                 </div>
 
                 <!-- Split Line -->
@@ -76,18 +77,18 @@
                 <div class="flow-parallel-h">
                     <div class="parallel-branch-h">
                         <div class="flow-node agent-node">
-                            <div class="node-glow"></div>
+                            
                             <i data-lucide="trending-up"></i>
                             <span>Financial</span>
-                            <p class="node-desc">Metrics</p>
+                            
                         </div>
                     </div>
                     <div class="parallel-branch-h">
                         <div class="flow-node agent-node">
-                            <div class="node-glow"></div>
+                            
                             <i data-lucide="target"></i>
                             <span>Strategic</span>
-                            <p class="node-desc">Insights</p>
+                            
                         </div>
                     </div>
                 </div>
@@ -104,10 +105,10 @@
 
                 <!-- Writer Agent -->
                 <div class="flow-node agent-node">
-                    <div class="node-glow"></div>
+                    
                     <i data-lucide="file-text"></i>
                     <span>Writer</span>
-                    <p class="node-desc">Report</p>
+                    
                 </div>
 
                 <!-- Connection Line -->
@@ -119,13 +120,16 @@
 
                 <!-- Output Node -->
                 <div class="flow-node end-node">
-                    <div class="node-glow"></div>
+                    
                     <i data-lucide="file-check"></i>
                     <span>Final Report</span>
-                    <p class="node-desc">Complete Analysis</p>
+                    
                 </div>
             </div>
         </div>
+
+        <!-- Configuration Panel Backdrop -->
+        <div id="configBackdrop" class="config-backdrop" style="display: none;" onclick="toggleConfig()"></div>
 
         <!-- Configuration Panel -->
         <div id="configPanel" class="config-panel" style="display: none;">
