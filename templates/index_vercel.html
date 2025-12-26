@@ -363,11 +363,7 @@
         </div>
     </div>
 
-    {% if use_vercel_script %}
-    <script src="{{ url_for('static', filename='script_vercel.js') }}"></script>
-    {% else %}
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    {% endif %}
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
