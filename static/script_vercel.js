@@ -70,30 +70,55 @@ function toggleAgentConfig(agent) {
 
 // Switch main tabs
 function switchTab(tabName) {
+    console.log('switchTab called with:', tabName);
+
+    // Update all tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
+        if (btn.getAttribute('onclick')?.includes(tabName)) {
+            btn.classList.add('active');
+        }
     });
-    event.target.closest('.tab-btn').classList.add('active');
 
+    // Update all tab panels
     document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.remove('active');
+        console.log('Hiding panel:', panel.id);
     });
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+
+    const targetPanel = document.getElementById(`${tabName}-tab`);
+    console.log('Target panel:', targetPanel?.id, 'found:', !!targetPanel);
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+        console.log('Showing panel:', targetPanel.id);
+    } else {
+        console.error('Panel not found:', `${tabName}-tab`);
+    }
 
     lucide.createIcons();
 }
 
 // Switch agent tabs
 function switchAgentTab(agentName) {
+    // Update all agent tab buttons
     document.querySelectorAll('.agent-tab-btn').forEach(btn => {
         btn.classList.remove('active');
+        if (btn.getAttribute('onclick')?.includes(agentName)) {
+            btn.classList.add('active');
+        }
     });
-    event.target.classList.add('active');
 
+    // Update all agent panels
     document.querySelectorAll('.agent-panel').forEach(panel => {
         panel.classList.remove('active');
     });
-    document.getElementById(`${agentName}-panel`).classList.add('active');
+
+    const targetPanel = document.getElementById(`${agentName}-panel`);
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+    }
+
+    lucide.createIcons();
 }
 
 // Start analysis
@@ -630,7 +655,7 @@ function switchToChatInterface(company, data) {
     currentCompany = company;
     analysisData = data;
 
-    // Hide initial UI elements
+    // Hide initial header and agent flow
     const header = document.querySelector('header');
     if (header) header.style.display = 'none';
 
@@ -640,27 +665,24 @@ function switchToChatInterface(company, data) {
     const initialInputSection = document.getElementById('initialInputSection');
     if (initialInputSection) initialInputSection.style.display = 'none';
 
+    // Keep analysis visible and move it into the ChatGPT layout
     const analysisContent = document.getElementById('analysisContent');
-    if (analysisContent) analysisContent.style.display = 'none';
-
-    // Show ChatGPT-style layout
     const chatgptLayout = document.getElementById('chatgptLayout');
-    if (chatgptLayout) {
-        chatgptLayout.style.display = 'flex';
-        console.log('ChatGPT layout shown');
-    } else {
-        console.error('ChatGPT layout element not found!');
-        return;
-    }
-
-    // Move analysis content (summary + agents tabs) into the results section
     const analysisResultsSection = document.getElementById('analysisResultsSection');
-    if (analysisResultsSection && analysisContent) {
-        // Clone the analysis content
-        const analysisClone = analysisContent.cloneNode(true);
-        analysisClone.style.display = 'block';
+
+    if (chatgptLayout && analysisContent && analysisResultsSection) {
+        // Show the ChatGPT layout
+        chatgptLayout.style.display = 'flex';
+
+        // Move (not clone) the original analysis content
+        analysisContent.style.display = 'block';
         analysisResultsSection.innerHTML = '';
-        analysisResultsSection.appendChild(analysisClone);
+        analysisResultsSection.appendChild(analysisContent);
+
+        console.log('ChatGPT layout shown with original analysis');
+    } else {
+        console.error('ChatGPT layout elements not found!');
+        return;
     }
 
     // Add company to chat history sidebar
@@ -668,9 +690,6 @@ function switchToChatInterface(company, data) {
 
     // Initialize icons
     lucide.createIcons();
-
-    // Re-attach tab switching events
-    attachTabEvents();
 }
 
 // Add company to chat history sidebar

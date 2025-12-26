@@ -303,10 +303,10 @@ def chat():
         {context.get('strategic', 'N/A')[:500]}
         """
 
-        # Call LLM for chat response
+        # Call LLM for chat response (using smaller model to save tokens)
         groq_client = get_groq_client()
         response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {
                     "role": "system",

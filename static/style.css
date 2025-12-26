@@ -1865,60 +1865,67 @@ button:disabled {
 }
 
 .chat-message {
-    display: flex;
-    gap: 1rem;
+    display: block;
+    margin-bottom: 2rem;
     animation: fadeIn 0.3s ease;
 }
 
 .chat-message.user {
-    flex-direction: row-reverse;
+    margin-bottom: 1.5rem;
 }
 
 .message-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.message-avatar svg {
-    width: 20px;
-    height: 20px;
-    color: #64c8ff;
-}
-
-.chat-message.user .message-avatar {
-    background: rgba(100, 200, 255, 0.2);
+    display: none;
 }
 
 .message-content {
-    flex: 1;
-    max-width: 70%;
+    width: 100%;
+    max-width: 100%;
 }
 
 .chat-message.user .message-content {
-    display: flex;
-    justify-content: flex-end;
+    display: block;
 }
 
 .message-bubble {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
     color: #ccc;
-    line-height: 1.6;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    max-width: none;
+}
+
+/* Apply summary output styles to chat messages */
+.message-bubble .output-h2,
+.message-bubble .output-h3,
+.message-bubble .output-paragraph,
+.message-bubble .output-list,
+.message-bubble .output-list-item,
+.message-bubble .output-code {
+    /* Inherit all the formatting from summary output */
 }
 
 .chat-message.user .message-bubble {
-    background: rgba(100, 200, 255, 0.15);
-    border-color: rgba(100, 200, 255, 0.3);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-weight: 500;
     color: #fff;
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
 }
+
+.chat-message.user .message-bubble::before {
+    content: "Q: ";
+    color: #64c8ff;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
 
 .message-bubble.loading {
     display: flex;
