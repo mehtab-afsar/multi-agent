@@ -284,7 +284,7 @@ def run_analysis(company):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', use_vercel_script=True)
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -312,4 +312,4 @@ def get_status():
     return jsonify(analysis_results)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8080)

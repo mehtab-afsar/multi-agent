@@ -1,4 +1,4 @@
-// script_vercel.js - Frontend for Vercel (synchronous) - Updated v6
+// script_vercel.js - Frontend for Vercel (synchronous) - Updated v14
 
 let agentConfig = {
     researcher: { style: 'bullets', focus: '' },
@@ -405,6 +405,12 @@ function updateUI(data) {
     if (data.summary) {
         const summaryContent = createElaborateSummary(data);
         document.getElementById('summaryContent').innerHTML = summaryContent;
+
+        // Show chat input now that summary is loaded
+        const chatInputFixed = document.getElementById('chatInputFixed');
+        if (chatInputFixed) {
+            chatInputFixed.style.display = 'block';
+        }
     }
 
     // Reinitialize icons
@@ -793,18 +799,24 @@ function switchToChatInterface(company, data) {
 function toggleUniversalSidebar() {
     const sidebar = document.getElementById('universalSidebar');
     const container = document.querySelector('.container');
+    const chatgptLayout = document.getElementById('chatgptLayout');
+    const chatInputFixed = document.getElementById('chatInputFixed');
     const icon = document.getElementById('sidebarToggleIcon');
     const reopenBtn = document.getElementById('sidebarReopenBtn');
 
     sidebar.classList.toggle('collapsed');
 
-    // Adjust container margin and show/hide reopen button
+    // Adjust container, chatgpt layout, and chat input margins and show/hide reopen button
     if (sidebar.classList.contains('collapsed')) {
-        container.style.marginLeft = '0';
+        if (container) container.style.marginLeft = '0';
+        if (chatgptLayout) chatgptLayout.style.left = '0';
+        if (chatInputFixed) chatInputFixed.style.left = '0';
         if (icon) icon.setAttribute('data-lucide', 'panel-left-open');
         if (reopenBtn) reopenBtn.style.display = 'block';
     } else {
-        container.style.marginLeft = '260px';
+        if (container) container.style.marginLeft = '260px';
+        if (chatgptLayout) chatgptLayout.style.left = '260px';
+        if (chatInputFixed) chatInputFixed.style.left = '260px';
         if (icon) icon.setAttribute('data-lucide', 'panel-left-close');
         if (reopenBtn) reopenBtn.style.display = 'none';
     }
@@ -816,14 +828,8 @@ function toggleUniversalSidebar() {
 function addToChatHistory(company) {
     console.log('addToChatHistory called with:', company);
 
-    // Try both the universal sidebar and the chatgpt layout sidebar
-    const universalList = document.getElementById('universalChatHistoryList');
-    const chatgptList = document.getElementById('chatHistoryList');
-
-    console.log('universalList:', universalList);
-    console.log('chatgptList:', chatgptList);
-
-    const historyList = universalList || chatgptList;
+    // Use only the universal sidebar
+    const historyList = document.getElementById('universalChatHistoryList');
     if (!historyList) {
         console.error('No history list found!');
         return;
@@ -906,6 +912,41 @@ function attachTabEvents() {
 }
 
 // Send chat message
+// Helper function to scroll to latest message
+function scrollToLatestMessage() {
+    setTimeout(() => {
+        // Find the last chat message
+        const messagesContainer = document.getElementById('chatMessagesArea');
+        const lastMessage = messagesContainer?.querySelector('.chat-message:last-child');
+
+        if (lastMessage) {
+            // Scroll the message into view
+            lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else {
+            // Fallback: Try to scroll the chatgpt layout or main content area
+            const chatgptLayout = document.getElementById('chatgptLayout');
+            const mainContentArea = document.querySelector('.main-content-area');
+
+            if (chatgptLayout && chatgptLayout.style.display !== 'none') {
+                chatgptLayout.scrollTo({
+                    top: chatgptLayout.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else if (mainContentArea) {
+                mainContentArea.scrollTo({
+                    top: mainContentArea.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, 150);
+}
+
 async function sendChatMessage() {
     // Try new input first, fallback to old one
     const input = document.getElementById('chatInputNew') || document.getElementById('chatInput');
@@ -941,6 +982,8 @@ async function sendChatMessage() {
     messagesContainer.insertAdjacentHTML('beforeend', userMessageHtml);
     lucide.createIcons();
 
+    // Don't scroll yet - wait for the answer
+
     // Add loading indicator
     const loadingHtml = `
         <div class="chat-message assistant loading-message">
@@ -959,7 +1002,8 @@ async function sendChatMessage() {
 
     messagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
     lucide.createIcons();
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Don't scroll yet - wait for the answer
 
     try {
         // Send to backend
@@ -1005,7 +1049,9 @@ async function sendChatMessage() {
 
         messagesContainer.insertAdjacentHTML('beforeend', assistantMessageHtml);
         lucide.createIcons();
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Smooth scroll to show the new response
+        scrollToLatestMessage();
 
         // No need to add to sidebar anymore - that's only for chat history
 

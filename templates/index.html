@@ -11,30 +11,36 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <!-- Universal Sidebar (Collapsible) -->
-    <div class="universal-sidebar" id="universalSidebar">
-        <div class="sidebar-toggle-container">
-            <button class="sidebar-collapse-btn" onclick="toggleUniversalSidebar()">
+    <!-- Universal Sidebar (Collapsible) - Initially Collapsed -->
+    <div class="universal-sidebar collapsed" id="universalSidebar">
+        <!-- Sidebar Header with Logo and Collapse Button -->
+        <div class="sidebar-header">
+            <div class="sidebar-branding">
+                <div class="sidebar-logo">Edge Alpha</div>
+            </div>
+            <button class="sidebar-collapse-btn" onclick="toggleUniversalSidebar()" title="Close sidebar">
                 <i data-lucide="panel-left-close" id="sidebarToggleIcon"></i>
             </button>
         </div>
 
+        <!-- New Analysis Button -->
         <button class="new-chat-btn" onclick="startNewAnalysis()">
             <i data-lucide="plus"></i>
             <span>New Analysis</span>
         </button>
 
+        <!-- Chat History List -->
         <div class="chat-history-list" id="universalChatHistoryList">
             <!-- Chat history items will be added here -->
         </div>
     </div>
 
     <!-- Floating button to reopen sidebar when collapsed -->
-    <button class="sidebar-reopen-btn" id="sidebarReopenBtn" onclick="toggleUniversalSidebar()" style="display: none;">
+    <button class="sidebar-reopen-btn" id="sidebarReopenBtn" onclick="toggleUniversalSidebar()" style="display: block;">
         <i data-lucide="panel-left-open"></i>
     </button>
 
-    <div class="container">
+    <div class="container" style="margin-left: 0;">
         <!-- Hero Section - Modern Landing -->
         <div class="hero-section" id="heroSection">
             <h1 class="hero-title">
@@ -383,27 +389,11 @@
 
         <!-- ChatGPT-style Layout (Hidden initially, shown after analysis) -->
         <div class="chatgpt-layout" id="chatgptLayout" style="display: none;">
-            <!-- Sidebar with Chat History -->
-            <div class="chat-history-sidebar" id="chatHistorySidebar">
-                <button class="new-chat-btn" onclick="startNewAnalysis()">
-                    <i data-lucide="plus"></i>
-                    <span>New Analysis</span>
-                </button>
-
-                <div class="chat-history-list" id="chatHistoryList">
-                    <!-- Chat history items will be added here -->
-                </div>
-            </div>
-
             <!-- Main Content Area -->
             <div class="main-content-area">
                 <!-- Compact Header Card (shown in chat mode) -->
                 <div class="compact-header-card" id="compactHeaderCard" style="display: none;">
                     <div class="compact-header-content">
-                        <div class="compact-logo">Edge Alpha</div>
-                        <div class="compact-divider">•</div>
-                        <div class="compact-subtitle">AI-powered research analysis</div>
-                        <div class="compact-divider">•</div>
                         <div class="compact-company" id="compactCompanyName"></div>
                     </div>
                 </div>
@@ -420,8 +410,8 @@
                         <!-- Messages will appear here -->
                     </div>
 
-                    <!-- Chat Input (Fixed at Bottom) -->
-                    <div class="chat-input-fixed">
+                    <!-- Chat Input (Fixed at Bottom) - Hidden until summary loads -->
+                    <div class="chat-input-fixed" id="chatInputFixed" style="display: none;">
                         <div class="chat-input-container">
                             <button class="settings-btn-chat" onclick="toggleConfig()" title="Settings">
                                 <i data-lucide="settings"></i>
