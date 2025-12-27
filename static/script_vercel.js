@@ -1,4 +1,4 @@
-// script_vercel.js - Frontend for Vercel (synchronous) - Updated v14
+// script_vercel.js - Frontend for Vercel (synchronous) - Updated v15
 
 let agentConfig = {
     researcher: { style: 'bullets', focus: '' },
@@ -161,7 +161,15 @@ async function startAnalysis() {
     companyInput.disabled = true;
     iconButtons.forEach(btn => btn.disabled = true);
 
-    // Hide the hero section, agents section title, flow diagram, and trusted section
+    // Hide the hero section, particles, agents section title, flow diagram, and trusted section
+    const particlesBg = document.getElementById('particlesBg');
+    if (particlesBg) {
+        particlesBg.style.opacity = '0';
+        setTimeout(() => {
+            particlesBg.style.display = 'none';
+        }, 500);
+    }
+
     const heroSection = document.getElementById('heroSection');
     if (heroSection) {
         setTimeout(() => {
@@ -189,8 +197,19 @@ async function startAnalysis() {
 
     // Show ChatGPT layout directly from the start
     const chatgptLayout = document.getElementById('chatgptLayout');
+    const sidebar = document.getElementById('universalSidebar');
+    const chatInputFixed = document.getElementById('chatInputFixed');
+
     if (chatgptLayout) {
         chatgptLayout.style.display = 'flex';
+        // Set correct left position based on sidebar state
+        if (sidebar && sidebar.classList.contains('collapsed')) {
+            chatgptLayout.style.left = '0';
+            if (chatInputFixed) chatInputFixed.style.left = '0';
+        } else {
+            chatgptLayout.style.left = '260px';
+            if (chatInputFixed) chatInputFixed.style.left = '260px';
+        }
     }
 
     // Add company to sidebar AFTER showing the layout
@@ -1201,6 +1220,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start typing effect
     typingInterval = setInterval(typeEffect, isDeleting ? 30 : 80);
 
+    // Initialize particle mouse effect
+    initParticleEffect();
+
     // Pause typing when user focuses on hero input
     const heroInput = document.getElementById('companyInputHero');
     if (heroInput) {
@@ -1230,6 +1252,46 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Particle Mouse Effect
+function initParticleEffect() {
+    const container = document.getElementById('particlesContainer');
+    if (!container) return;
+
+    let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Track mouse movement
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        createParticle(mouseX, mouseY);
+    });
+
+    function createParticle(x, y) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+
+        const size = Math.random() * 4 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+
+        container.appendChild(particle);
+
+        // Animate particle
+        setTimeout(() => {
+            particle.style.opacity = '0.6';
+        }, 10);
+
+        // Remove particle after animation
+        setTimeout(() => {
+            particle.remove();
+        }, 1000);
+    }
+}
+
 // Start analysis from hero search bar
 async function startAnalysisFromHero() {
     const heroInput = document.getElementById('companyInputHero');
@@ -1245,7 +1307,15 @@ async function startAnalysisFromHero() {
     heroInput.disabled = true;
     iconButtons.forEach(btn => btn.disabled = true);
 
-    // Hide the hero section, agents section title, flow diagram, and trusted section
+    // Hide the hero section, particles, agents section title, flow diagram, and trusted section
+    const particlesBg = document.getElementById('particlesBg');
+    if (particlesBg) {
+        particlesBg.style.opacity = '0';
+        setTimeout(() => {
+            particlesBg.style.display = 'none';
+        }, 500);
+    }
+
     const heroSection = document.getElementById('heroSection');
     if (heroSection) {
         setTimeout(() => {
@@ -1273,8 +1343,19 @@ async function startAnalysisFromHero() {
 
     // Show ChatGPT layout directly from the start
     const chatgptLayout = document.getElementById('chatgptLayout');
+    const sidebar = document.getElementById('universalSidebar');
+    const chatInputFixed = document.getElementById('chatInputFixed');
+
     if (chatgptLayout) {
         chatgptLayout.style.display = 'flex';
+        // Set correct left position based on sidebar state
+        if (sidebar && sidebar.classList.contains('collapsed')) {
+            chatgptLayout.style.left = '0';
+            if (chatInputFixed) chatInputFixed.style.left = '0';
+        } else {
+            chatgptLayout.style.left = '260px';
+            if (chatInputFixed) chatInputFixed.style.left = '260px';
+        }
     }
 
     // Add company to sidebar AFTER showing the layout
